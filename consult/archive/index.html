@@ -1,0 +1,296 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="Mark Otto, Jacob Thornton, and Bootstrap contributors">
+    <meta name="generator" content="Hugo 0.108.0">
+    <title>Carousel Template · Bootstrap v5.3</title>
+
+    <link rel="canonical" href="https://getbootstrap.com/docs/5.3/examples/carousel/">
+
+    
+
+    
+
+<link href="../assets/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+
+      .btn-fit {
+        --bs-btn-color:#fff;
+        --bs-btn-bg:#0baeff;
+        --bs-btn-border-color:#0baeff;
+        --bs-btn-hover-color:#fff;
+        --bs-btn-hover-bg:#099ed9;
+        --bs-btn-hover-border-color:#0899cc;
+        --bs-btn-focus-shadow-rgb:49,132,253;
+        --bs-btn-active-color:#fff;
+        --bs-btn-active-bg:#0899cc;
+        --bs-btn-active-border-color:#0894c0;
+        --bs-btn-active-shadow:inset 0 3px 5px rgba(0, 0, 0, 0.125);
+        --bs-btn-disabled-color:#fff;
+        --bs-btn-disabled-bg:#0baeff;
+        --bs-btn-disabled-border-color:#0baeff
+      }
+
+      .bd-placeholder-img {
+        font-size: 1.125rem;
+        text-anchor: middle;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        user-select: none;
+      }
+
+      @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+          font-size: 3.5rem;
+        }
+      }
+
+      .b-example-divider {
+        height: 3rem;
+        background-color: rgba(0, 0, 0, .1);
+        border: solid rgba(0, 0, 0, .15);
+        border-width: 1px 0;
+        box-shadow: inset 0 .5em 1.5em rgba(0, 0, 0, .1), inset 0 .125em .5em rgba(0, 0, 0, .15);
+      }
+
+      .b-example-vr {
+        flex-shrink: 0;
+        width: 1.5rem;
+        height: 100vh;
+      }
+
+      .bi {
+        vertical-align: -.125em;
+        fill: currentColor;
+      }
+
+      .nav-scroller {
+        position: relative;
+        z-index: 2;
+        height: 2.75rem;
+        overflow-y: hidden;
+      }
+
+      .nav-scroller .nav {
+        display: flex;
+        flex-wrap: nowrap;
+        padding-bottom: 1rem;
+        margin-top: -1px;
+        overflow-x: auto;
+        text-align: center;
+        white-space: nowrap;
+        -webkit-overflow-scrolling: touch;
+      }
+    </style>
+
+    
+    <!-- Custom styles for this template -->
+    <link href="../styles/fit9to5.css" rel="stylesheet">
+    <link href="../styles/dropdowns.css" rel="stylesheet">
+  </head>
+  <body>
+  <svg>
+    <symbol id="arrow-left-short" viewBox="0 0 16 16">
+      <path fill-rule="evenodd" d="M12 8a.5.5 0 0 1-.5.5H5.707l2.147 2.146a.5.5 0 0 1-.708.708l-3-3a.5.5 0 0 1 0-.708l3-3a.5.5 0 1 1 .708.708L5.707 7.5H11.5a.5.5 0 0 1 .5.5z"/>
+    </symbol>
+  
+    <symbol id="arrow-right-short" viewBox="0 0 16 16">
+      <path fill-rule="evenodd" d="M4 8a.5.5 0 0 1 .5-.5h5.793L8.146 5.354a.5.5 0 1 1 .708-.708l3 3a.5.5 0 0 1 0 .708l-3 3a.5.5 0 0 1-.708-.708L10.293 8.5H4.5A.5.5 0 0 1 4 8z"/>
+    </symbol>
+  </svg>  
+  
+<header>
+  <nav class="navbar navbar-expand-md fixed-top bg-white">
+    <div class="container-fluid">
+      
+        <img src="../assets/icon/logo.png" width="25%" height="25%" class="d-inline-block align-top" alt="Bootstrap" loading="lazy">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarCollapse">
+        <ul class="navbar-nav me-auto mb-2 mb-md-0">
+          <li class="nav-item">
+            <a class="nav-link active" aria-current="page" href="#">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="../consult/index.html">Sign Up</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="../connect/index.html">Connnect</a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<main>
+    <div class="dropdown-menu d-block position-static p-2 shadow rounded-3 w-340px">
+      <div class="d-grid gap-1">
+        <div class="cal">
+          <div class="cal-month">
+            <button class="btn cal-btn" type="button">
+              <svg class="bi" width="16" height="16"><use xlink:href="#arrow-left-short"/></svg>
+            </button>
+            <strong class="cal-month-name">June</strong>
+            <select class="form-select cal-month-name d-none">
+              <option value="January">January</option>
+              <option value="February">February</option>
+              <option value="March">March</option>
+              <option value="April">April</option>
+              <option value="May">May</option>
+              <option selected value="June">June</option>
+              <option value="July">July</option>
+              <option value="August">August</option>
+              <option value="September">September</option>
+              <option value="October">October</option>
+              <option value="November">November</option>
+              <option value="December">December</option>
+            </select>
+            <button class="btn cal-btn" type="button">
+              <svg class="bi" width="16" height="16"><use xlink:href="#arrow-right-short"/></svg>
+            </button>
+          </div>
+          <div class="cal-weekdays text-muted">
+            <div class="cal-weekday">Sun</div>
+            <div class="cal-weekday">Mon</div>
+            <div class="cal-weekday">Tue</div>
+            <div class="cal-weekday">Wed</div>
+            <div class="cal-weekday">Thu</div>
+            <div class="cal-weekday">Fri</div>
+            <div class="cal-weekday">Sat</div>
+          </div>
+          <div class="cal-days">
+            <button class="btn cal-btn" disabled type="button">30</button>
+            <button class="btn cal-btn" disabled type="button">31</button>
+    
+            <button class="btn cal-btn" type="button">1</button>
+            <button class="btn cal-btn" type="button">2</button>
+            <button class="btn cal-btn" type="button">3</button>
+            <button class="btn cal-btn" type="button">4</button>
+            <button class="btn cal-btn" type="button">5</button>
+            <button class="btn cal-btn" type="button">6</button>
+            <button class="btn cal-btn" type="button">7</button>
+    
+            <button class="btn cal-btn" type="button">8</button>
+            <button class="btn cal-btn" type="button">9</button>
+            <button class="btn cal-btn" type="button">10</button>
+            <button class="btn cal-btn" type="button">11</button>
+            <button class="btn cal-btn" type="button">12</button>
+            <button class="btn cal-btn" type="button">13</button>
+            <button class="btn cal-btn" type="button">14</button>
+    
+            <button class="btn cal-btn" type="button">15</button>
+            <button class="btn cal-btn" type="button">16</button>
+            <button class="btn cal-btn" type="button">17</button>
+            <button class="btn cal-btn" type="button">18</button>
+            <button class="btn cal-btn" type="button">19</button>
+            <button class="btn cal-btn" type="button">20</button>
+            <button class="btn cal-btn" type="button">21</button>
+    
+            <button class="btn cal-btn" type="button">22</button>
+            <button class="btn cal-btn" type="button">23</button>
+            <button class="btn cal-btn" type="button">24</button>
+            <button class="btn cal-btn" type="button">25</button>
+            <button class="btn cal-btn" type="button">26</button>
+            <button class="btn cal-btn" type="button">27</button>
+            <button class="btn cal-btn" type="button">28</button>
+    
+            <button class="btn cal-btn" type="button">29</button>
+            <button class="btn cal-btn" type="button">30</button>
+            <button class="btn cal-btn" type="button">31</button>
+          </div>
+        </div>
+      </div>
+  </div>
+
+  <!-- FOOTER -->
+  <footer class="container">
+    <p class="float-end"><a href="#">Back to top</a></p>
+    <p>&copy; 2023 FIT9to5 &middot; <a href="#">Privacy</a> &middot; <a href="#">Terms</a></p>
+  </footer>
+</main>
+
+
+    <script src="../assets/dist/js/bootstrap.bundle.min.js"></script>
+    <script type="module">
+      // Import the functions you need from the SDKs you need
+      import { initializeApp } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-app.js";
+      import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/9.19.1/firebase-database.js";
+      // TODO: Add SDKs for Firebase products that you want to use
+      // https://firebase.google.com/docs/web/setup#available-libraries
+    
+      // Your web app's Firebase configuration
+      // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+      const firebaseConfig = {
+        apiKey: "AIzaSyAJ_UUHWms3JluG53HEN-7e0dFOMhvmyLM",
+        authDomain: "fit9to5-ab077.firebaseapp.com",
+        projectId: "fit9to5-ab077",
+        storageBucket: "fit9to5-ab077.appspot.com",
+        messagingSenderId: "188974556272",
+        appId: "1:188974556272:web:469d6f425d86897ff680b5",
+        measurementId: "G-XK2QT14T7M",
+        databaseURL: "https://fit9to5-ab077-default-rtdb.firebaseio.com"
+      };
+    
+      // Initialize Firebase
+      const app = initializeApp(firebaseConfig);
+      const database = getDatabase(app);
+
+      function encodeDate(day, month, year) {
+        return year + month + day;
+      }
+
+      function bookAppt(d, m, y, t, name, phone) {
+        set(ref(database, 'calendar/' + encodeDate(d,m,y) + '/' + time), {
+          name: name,
+          phone: phone
+        });
+      }
+
+      function interpTimes(start, stop, iter) {
+        times = [];
+        for (t=start; t<stop; t+=iter) {
+          mins = t % 100;
+          if (mins >= 60) {
+            t += 40;
+          }
+          times.push(t);
+        }
+      }
+
+      function getAvail(w) {
+        switch(w) {
+          case 'Sun':
+            return interpTimes(900, 1700, 15); // 9am - 5pm
+          case 'Mon':
+            return interpTimes(1730, 2200, 15); // 5:30pm - 10pm
+          case 'Tue':
+            return interpTimes(1730, 2200, 15); // 5:30pm - 10pm
+          case 'Wed':
+            return interpTimes(1730, 2200, 15); // 5:30pm - 10pm
+          case 'Thu':
+            return interpTimes(1730, 2200, 15); // 5:30pm - 10pm
+          case 'Fri':
+            return interpTimes(900, 2200, 15); // 9am - 10pm
+          case 'Sat':
+            return interpTimes(900, 2200, 15); // 9am - 10pm
+        }
+      }
+
+      function checkDate(d, m, y, w) {
+        get(child(ref(database), 'calendar/' + encodeDate(d,m,y))).then((snapshot) => {
+          if (snapshot.exists()) {
+            
+          }
+        })
+      }
+    </script>
+
+      
+  </body>
+</html>
