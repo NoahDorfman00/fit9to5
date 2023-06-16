@@ -45,8 +45,31 @@
       } 
       else
       {
-        inqRef.child(name).child("email").set(email);
-        inqRef.child(name).child("phone").set(num);
+        if (email == "")
+        {
+          inqRef.push({
+            "timestamp": Date.now(),
+            "name": name,
+            "phone": phone
+          });
+        }
+        else if (num == "")
+        {
+          inqRef.push({
+            "timestamp": Date.now(),
+            "name": name,
+            "email": email
+          });
+        }
+        else
+        {
+          inqRef.push({
+            "timestamp": Date.now(),
+            "name": name,
+            "phone": phone,
+            "email": email
+          });
+        }
         window.alert("Thank you "+name+"! I look forward to working with you!");
       }
       rsvpForm.reset();	
@@ -270,7 +293,7 @@
     </div>
 
     <hr class="featurette-divider">
-    
+
     <!-- /END THE FEATURETTES -->
 
   </div><!-- /.container -->
