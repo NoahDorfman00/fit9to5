@@ -31,29 +31,34 @@
     var inqRef = firebase.database().ref().child("Inquiries");
     
     function inqSubmit() {
-      var name = document.getElementById("inqFormName").value;
-      var email = document.getElementById("inqFormMail").value;
-      var num = document.getElementById("inqFormNum").value;
-      
-      if (name == "")
+      var inq = {
+        "time": Date.now(),
+        "name": String(document.getElementById("inqFormName").value),
+        "email": String(document.getElementById("inqFormMail").value),
+        "phone": String(document.getElementById("inqFormNum").value)
+      }
+      console.log(JSON.stringify(inq));
+
+      var issue = false;
+      if (!inq.name)
       {
+        console.log("no name");
+        issue = true;
         window.alert("Please enter your name!");
       }
-      else if (num == "" && email == "")
+      if (!(inq.phone || inq.email))
       {
+        console.log("no email or number");
+        issue = true;
         window.alert("Please enter your phone number and/or email address!");
-      } 
-      else
-      {
-        inqRef.push({
-          "timestamp": Date.now(),
-          "name": name,
-          "phone": phone,
-          "email": email
-        });
-        window.alert("Thank you "+name+"! I look forward to working with you!");
       }
-      rsvpForm.reset();	
+
+      if (!issue)
+      {
+        inqRef.push(inq);
+      }
+
+      rsvpForm.reset(); 	
     }
     
     </script>
@@ -201,7 +206,6 @@
       <div class="modal-dialog">
         <div class="modal-content rounded-4 shadow">
           <div class="modal-header p-5 pb-4 border-bottom-0">
-            <!-- <h1 class="modal-title fs-5" >Modal title</h1> -->
             <h1 class="fw-bold mb-0 fs-2">Sign up for a FREE consultation</h1>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
@@ -209,17 +213,17 @@
             <form class="" id="inqForm">
               <div class="form-floating mb-3">
                 <input type="name" class="form-control rounded-3" id="inqFormName" placeholder="First Last">
-                <label for="floatingInput">Full name</label>
+                <label for="inqFormName">Full name</label>
               </div>
               <div class="form-floating mb-3">
                 <input type="email" class="form-control rounded-3" id="inqFormMail" placeholder="name@example.com">
-                <label for="floatingInput">Email address</label>
+                <label for="inqFormMail">Email address</label>
               </div>
               <div class="form-floating mb-3">
                 <input type="phone" class="form-control rounded-3" id="inqFormNum" placeholder="(123)456-7890">
-                <label for="floatingInput">Phone number</label>
+                <label for="inqFormNum">Phone number</label>
               </div>
-              <button class="w-100 mb-2 btn btn-lg rounded-3 btn-fit" type="submit" onclick="inqSubmit()">Sign up</button>
+              <button class="w-100 mb-2 btn btn-lg rounded-3 btn-fit" onclick="inqSubmit()">Sign up</button>
               <small class="text-muted">By clicking Sign up, you agree to be contacted by FIT9to5.</small>
             </form>
           </div>
