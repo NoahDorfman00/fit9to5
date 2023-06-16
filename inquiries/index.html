@@ -30,6 +30,28 @@
     var Ref = firebase.database().ref();
     var inqRef = firebase.database().ref().child("Inquiries");
 
+
+    $(document).ready(function () {
+      // Use the given data to create 
+      // the table and display it
+      $('table').bootstrapTable({
+        data: tableData
+      });
+    });
+    var tableData = 
+      [
+        {
+          "time":"0",
+          "name":"First Last",
+          "email":"email@website.com",
+          "phone":"1234567890"
+        }
+      ];
+    // inqRef.on('value', (snapshot) => {
+    //   tableData = snapshot.val();
+    // });
+
+
     function signIn() {
       var email = document.getElementById("email").value;
       var password = document.getElementById("password").value;
@@ -38,18 +60,7 @@
         .then((userCredential) => {
           // Signed in
           var user = userCredential.user
-          
-          inqRef.on('value', (snapshot) => {
-            const data = snapshot.val();
-
-            $(document).ready(function () {
-              // Use the given data to create 
-              // the table and display it
-              $('table').bootstrapTable({
-                data: data
-              });
-            });
-          });
+          signedIn = true;
           // ...
         })
         .catch((error) => {
@@ -134,7 +145,7 @@
       <div class="collapse navbar-collapse" id="navbarCollapse">
         <ul class="navbar-nav me-auto mb-2 mb-md-0">
           <li class="nav-item">
-            <a class="nav-link" aria-current="page" href="#">Home</a>
+            <a class="nav-link" aria-current="page" href="../index.html">Home</a>
           </li>
           <li class="nav-item">
             <a class="nav-link" data-bs-toggle="modal" data-bs-target="#signup">Sign Up</a>
@@ -149,9 +160,14 @@
 </header>
 
 <main>
-  <div class="container">
-    <p><a class="btn btn-lg btn-fit" data-bs-toggle="modal" data-bs-target="#signin">Sign In</a></p>
-
+  <div class="mt-5 container">
+    <div class="row mb-3 text-center">
+      <div class="pt-5 col-md-4"></div>
+      <div class="pt-5 col-md-4">
+        <p><a class="btn btn-lg btn-fit" data-bs-toggle="modal" data-bs-target="#signin">Sign In</a></p>
+      </div>
+      <div class="pt-5 col-md-4"></div>
+    </div>
     <div class="modal" id="signin" role="dialog">
       <div class="modal-dialog">
         <div class="modal-content rounded-4 shadow">
@@ -177,14 +193,14 @@
     </div>
   </div>
 
-  <div class="container">
+  <div class="container" >
     <h1 class="text text-center ">
       Inquiries
     </h1>
     <h6 class="text text-center">
       FIT9to5 inqiry table.
     </h6>
-      <table class="table-striped border-success">
+      <table id="table" class="table-striped border-success" data-bs-toggle="table">
         <thead>
           <tr>
             <th data-field="time">
