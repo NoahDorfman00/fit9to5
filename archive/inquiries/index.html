@@ -25,50 +25,104 @@
     };
     firebase.initializeApp(config);
     </script>
-    
-    <!-- <script>
+    <script src=
+    "https://unpkg.com/bootstrap-table@1.16.0/dist/bootstrap-table.min.js">
+      </script>
+    <script>
     var Ref = firebase.database().ref();
     var inqRef = firebase.database().ref().child("Inquiries");
 
-
     $(document).ready(function () {
+  
       // Use the given data to create 
       // the table and display it
       $('table').bootstrapTable({
-        data: tableData
+        data: mydata
       });
     });
-    var tableData = 
+
+    // Specify the JSON data to be displayed
+    var mydata =
       [
         {
-          "time":"0",
-          "name":"First Last",
-          "email":"email@website.com",
-          "phone":"1234567890"
+          "id": "24323",
+          "name": "Mark Smith",
+          "date": "25/5/2020"
+        },
+        {
+          "id": "24564",
+          "name": "Caitlin MacDonald",
+          "date": "17/5/2020"
+        },
+        {
+          "id": "24345",
+          "name": "Jessie Johnson ",
+          "date": "1/5/2020"
+        },
+        {
+          "id": "24874",
+          "name": "Alen Williams",
+          "date": "14/5/2020"
+        },
+        {
+          "id": "24323",
+          "name": "Maria Garcia ",
+          "date": "13/5/2020"
         }
       ];
+
+    // $('#table').bootstrapTable({
+    //   columns: [{
+    //     field: 'id',
+    //     title: 'Item ID'
+    //   }, {
+    //     field: 'name',
+    //     title: 'Item Name'
+    //   }, {
+    //     field: 'price',
+    //     title: 'Item Price'
+    //   }],
+    //   data: [{
+    //     id: 1,
+    //     name: 'Item 1',
+    //     price: '$1'
+    //   }, {
+    //     id: 2,
+    //     name: 'Item 2',
+    //     price: '$2'
+    //   }]
+    // });
+
+    // $(document).ready(function () {
+    //   // Use the given data to create 
+    //   // the table and display it
+    //   $('table').bootstrapTable({
+    //     data: tableData
+    //   });
+    // });
+    
     // inqRef.on('value', (snapshot) => {
     //   tableData = snapshot.val();
     // });
 
 
-    function signIn() {
-      var email = document.getElementById("email").value;
-      var password = document.getElementById("password").value;
+    // function signIn() {
+    //   var email = document.getElementById("email").value;
+    //   var password = document.getElementById("password").value;
 
-      firebase.auth().signInWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-          // Signed in
-          var user = userCredential.user
-          signedIn = true;
-          // ...
-        })
-        .catch((error) => {
-          var errorCode = error.code;
-          var errorMessage = error.message;
-        });
-    }   
-    </script> -->
+    //   firebase.auth().signInWithEmailAndPassword(email, password)
+    //     .then((userCredential) => {
+    //       // Signed in
+    //       var user = userCredential.user
+    //       signedIn = true;
+    //       // ...
+    //     })
+    //     .catch((error) => {
+    //       var errorCode = error.code;
+    //       var errorMessage = error.message;
+    //     });
+    // }   
+    </script>
 
     
 
@@ -200,7 +254,28 @@
     <h6 class="text text-center">
       FIT9to5 inqiry table.
     </h6>
-      <table id="table" class="table-striped border-success" data-bs-toggle="table">
+    <table class="table table-striped border-success" id="table">
+      <thead>
+        <tr>
+          <th data-field="id">
+            <span class="text-success">
+              Employee ID
+            </span>
+          </th>
+          <th data-field="name">
+            <span class="text-success">
+              Employee Name 
+            </span>
+          </th>
+          <th data-field="date">
+            <span class="text-success">
+              Joining Date 
+            </span>
+          </th>
+        </tr>
+      </thead>
+    </table>    
+      <!-- <table id="table" class="table-striped border-success" data-bs-toggle="table">
         <thead>
           <tr>
             <th data-field="time">
@@ -225,7 +300,7 @@
             </th>
           </tr>
         </thead>
-      </table>
+      </table> -->
   </div>
 
   <!-- FOOTER -->
