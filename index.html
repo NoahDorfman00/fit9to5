@@ -59,10 +59,11 @@
 
       if (!issue)
       {
-        inqRef.child(inq.key).child("time").set(inq.time);
-        inqRef.child(inq.key).child("name").set(inq.name);
-        inqRef.child(inq.key).child("email").set(inq.email);
-        inqRef.child(inq.key).child("phone").set(inq.phone);
+        keyRef = inqRef.child(inq.key);
+        keyRef.child("time").set(inq.time);
+        keyRef.child("name").set(inq.name);
+        keyRef.child("email").set(inq.email);
+        keyRef.child("phone").set(inq.phone);
         console.log("Data set");
       }
 
