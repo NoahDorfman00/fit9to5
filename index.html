@@ -12,6 +12,8 @@
 
     <script src="https://www.gstatic.com/firebasejs/4.12.1/firebase.js"></script>
     <script>
+
+      
     // Initialize Firebase
     var config = {
       apiKey: "AIzaSyAJ_UUHWms3JluG53HEN-7e0dFOMhvmyLM",
@@ -36,7 +38,7 @@
 
       var inq = {
         "key": String(elapsed),
-        "time": date.toUTCString(),
+        "time": date.toLocaleString('en-US', { timeZone: 'America/New_York' }),
         "name": String(document.getElementById("inqFormName").value),
         "email": String(document.getElementById("inqFormMail").value),
         "phone": String(document.getElementById("inqFormNum").value)
