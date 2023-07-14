@@ -31,8 +31,12 @@
     var inqRef = firebase.database().ref().child("Inquiries");
     
     function inqSubmit() {
+      const elapsed = Date.now();
+      const date = new Date(elapsed);
+
       var inq = {
-        "time": Date.now(),
+        "key": String(elapsed),
+        "time": date.toUTCString(),
         "name": String(document.getElementById("inqFormName").value),
         "email": String(document.getElementById("inqFormMail").value),
         "phone": String(document.getElementById("inqFormNum").value)
@@ -55,10 +59,14 @@
 
       if (!issue)
       {
-        inqRef.child(inq.name).set(inq);
+        inqRef.child(inq.key).child("time").set(inq.time);
+        inqRef.child(inq.key).child("name").set(inq.name);
+        inqRef.child(inq.key).child("email").set(inq.email);
+        inqRef.child(inq.key).child("phone").set(inq.phone);
+        console.log("Data set");
       }
 
-      rsvpForm.reset(); 	
+      inqForm.reset(); 	
     }
     
     </script>
