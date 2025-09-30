@@ -14,7 +14,12 @@ const stripePriceId = defineSecret("STRIPE_PRICE_ID");
 
 // Initialize CORS middleware with specific configuration
 const corsHandler = cors({
-  origin: ["http://localhost:3000", "https://coaching.fit9to5.com", "https://fit9to5.firebaseapp.com"],
+  origin: [
+    "http://localhost:3000",
+    "https://coaching.fit9to5.com",
+    "https://fit9to5.firebaseapp.com",
+    "https://fit9to5.vercel.app",
+  ],
   methods: ["POST", "OPTIONS"],
   credentials: true,
   allowedHeaders: ["Content-Type", "Authorization"],
@@ -30,7 +35,7 @@ export const createCheckoutSession = onRequest({
 }, async (req, res) => {
   // Handle preflight requests
   if (req.method === "OPTIONS") {
-    res.set("Access-Control-Allow-Origin", req.headers.origin || "http://localhost:3000");
+    res.set("Access-Control-Allow-Origin", req.headers.origin || "https://coaching.fit9to5.com");
     res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
     res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
     res.set("Access-Control-Allow-Credentials", "true");
@@ -38,6 +43,7 @@ export const createCheckoutSession = onRequest({
     return;
   }
 
+  // Use the cors middleware
   return corsHandler(req, res, async () => {
     try {
       const authHeader = req.headers.authorization;
@@ -117,6 +123,16 @@ export const cancelSubscription = onRequest({
   cors: false,
   region: "us-central1",
 }, async (req, res) => {
+  // Handle preflight requests
+  if (req.method === "OPTIONS") {
+    res.set("Access-Control-Allow-Origin", req.headers.origin || "https://coaching.fit9to5.com");
+    res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+    res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.set("Access-Control-Allow-Credentials", "true");
+    res.status(204).send("");
+    return;
+  }
+
   return corsHandler(req, res, async () => {
     try {
       const authHeader = req.headers.authorization;
@@ -177,6 +193,16 @@ export const reactivateSubscription = onRequest({
   cors: false,
   region: "us-central1",
 }, async (req, res) => {
+  // Handle preflight requests
+  if (req.method === "OPTIONS") {
+    res.set("Access-Control-Allow-Origin", req.headers.origin || "https://coaching.fit9to5.com");
+    res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+    res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.set("Access-Control-Allow-Credentials", "true");
+    res.status(204).send("");
+    return;
+  }
+
   return corsHandler(req, res, async () => {
     try {
       const authHeader = req.headers.authorization;
