@@ -114,7 +114,7 @@ const Home: React.FC = () => {
                             mb: 3
                         }}
                     >
-                        Transform Your 9-to-5
+                        Get Fit on Your Time
                     </Typography>
                     <Typography
                         variant="h5"
