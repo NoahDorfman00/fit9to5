@@ -14,7 +14,7 @@ const stripePriceId = defineSecret("STRIPE_PRICE_ID");
 
 // Initialize CORS middleware with specific configuration
 const corsHandler = cors({
-  origin: ["http://localhost:3000", "https://fit9to5.com", "https://fit9to5.firebaseapp.com"],
+  origin: ["http://localhost:3000", "https://coaching.fit9to5.com", "https://fit9to5.firebaseapp.com"],
   methods: ["POST", "OPTIONS"],
   credentials: true,
   allowedHeaders: ["Content-Type", "Authorization"],
