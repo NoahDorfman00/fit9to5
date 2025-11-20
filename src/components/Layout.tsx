@@ -35,6 +35,14 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                     </Box>
                     {/* Desktop Menu */}
                     <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', gap: 2 }}>
+                        <Button 
+                            color="primary" 
+                            component={Link} 
+                            to="/macros" 
+                            sx={{ textTransform: 'none', fontWeight: 700, fontSize: 16 }}
+                        >
+                            Macro Calculator
+                        </Button>
                         {loading ? (
                             <CircularProgress color="primary" size={24} />
                         ) : user ? (
@@ -60,6 +68,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                         <Drawer anchor="right" open={drawerOpen} onClose={() => setDrawerOpen(false)}>
                             <Box sx={{ width: 240 }} role="presentation" onClick={() => setDrawerOpen(false)}>
                                 <List>
+                                    <ListItem button component={Link} to="/macros">
+                                        <ListItemText primary="Macro Calculator" />
+                                    </ListItem>
+                                    <Divider />
                                     {loading ? (
                                         <ListItem><CircularProgress color="primary" size={24} /></ListItem>
                                     ) : user ? (

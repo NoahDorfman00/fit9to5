@@ -16,7 +16,7 @@ const stripePriceId = defineSecret("STRIPE_PRICE_ID");
 const corsHandler = cors({
   origin: [
     "http://localhost:3000",
-    "https://coaching.fit9to5.com",
+    "https://fit9to5.com",
     "https://fit9to5.firebaseapp.com",
     "https://fit9to5.vercel.app",
   ],
@@ -35,7 +35,7 @@ export const createCheckoutSession = onRequest({
 }, async (req, res) => {
   // Handle preflight requests
   if (req.method === "OPTIONS") {
-    res.set("Access-Control-Allow-Origin", req.headers.origin || "https://coaching.fit9to5.com");
+    res.set("Access-Control-Allow-Origin", req.headers.origin || "https://fit9to5.com");
     res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
     res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
     res.set("Access-Control-Allow-Credentials", "true");
@@ -125,7 +125,7 @@ export const cancelSubscription = onRequest({
 }, async (req, res) => {
   // Handle preflight requests
   if (req.method === "OPTIONS") {
-    res.set("Access-Control-Allow-Origin", req.headers.origin || "https://coaching.fit9to5.com");
+    res.set("Access-Control-Allow-Origin", req.headers.origin || "https://fit9to5.com");
     res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
     res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
     res.set("Access-Control-Allow-Credentials", "true");
@@ -195,7 +195,7 @@ export const reactivateSubscription = onRequest({
 }, async (req, res) => {
   // Handle preflight requests
   if (req.method === "OPTIONS") {
-    res.set("Access-Control-Allow-Origin", req.headers.origin || "https://coaching.fit9to5.com");
+    res.set("Access-Control-Allow-Origin", req.headers.origin || "https://fit9to5.com");
     res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
     res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
     res.set("Access-Control-Allow-Credentials", "true");

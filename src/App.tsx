@@ -7,6 +7,7 @@ import Home from './pages/Home';
 import Auth from './pages/Auth';
 import Profile from './pages/Profile';
 import Success from './pages/Success';
+import Macros from './pages/Macros';
 import { AuthProvider } from './context/AuthContext';
 
 const theme = createTheme({
@@ -71,6 +72,7 @@ function App() {
                             <Route path="/auth" element={<Auth />} />
                             <Route path="/profile" element={<Profile />} />
                             <Route path="/success" element={<Success />} />
+                            <Route path="/macros" element={<Macros />} />
                         </Routes>
                     </Layout>
                 </Router>
