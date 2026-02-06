@@ -1,7 +1,7 @@
 import * as admin from "firebase-admin";
 import Stripe from "stripe";
-import { onRequest } from "firebase-functions/v2/https";
-import { defineSecret } from "firebase-functions/params";
+import {onRequest} from "firebase-functions/v2/https";
+import {defineSecret} from "firebase-functions/params";
 import * as cors from "cors";
 
 // Initialize Firebase Admin
@@ -48,7 +48,7 @@ export const createCheckoutSession = onRequest({
     try {
       const authHeader = req.headers.authorization;
       if (!authHeader?.startsWith("Bearer ")) {
-        res.status(401).json({ error: "Unauthorized" });
+        res.status(401).json({error: "Unauthorized"});
         return;
       }
 
@@ -109,10 +109,10 @@ export const createCheckoutSession = onRequest({
         client_reference_id: uid,
       });
 
-      res.json({ sessionId: session.id });
+      res.json({sessionId: session.id});
     } catch (error) {
       console.error("Error creating checkout session:", error);
-      res.status(500).json({ error: "Failed to create checkout session" });
+      res.status(500).json({error: "Failed to create checkout session"});
     }
   });
 });
@@ -137,7 +137,7 @@ export const cancelSubscription = onRequest({
     try {
       const authHeader = req.headers.authorization;
       if (!authHeader?.startsWith("Bearer ")) {
-        res.status(401).json({ error: "Unauthorized" });
+        res.status(401).json({error: "Unauthorized"});
         return;
       }
 
@@ -150,7 +150,7 @@ export const cancelSubscription = onRequest({
       const stripeCustomerId = customerIdRef.val();
 
       if (!stripeCustomerId) {
-        res.status(404).json({ error: "No Stripe customer found" });
+        res.status(404).json({error: "No Stripe customer found"});
         return;
       }
 
@@ -166,7 +166,7 @@ export const cancelSubscription = onRequest({
       });
 
       if (subscriptions.data.length === 0) {
-        res.status(404).json({ error: "No active subscription found" });
+        res.status(404).json({error: "No active subscription found"});
         return;
       }
 
@@ -179,10 +179,10 @@ export const cancelSubscription = onRequest({
         .ref(`users/${uid}/subscriptionStatus`)
         .set("pending_cancellation");
 
-      res.json({ success: true });
+      res.json({success: true});
     } catch (error) {
       console.error("Error canceling subscription:", error);
-      res.status(500).json({ error: "Failed to cancel subscription" });
+      res.status(500).json({error: "Failed to cancel subscription"});
     }
   });
 });
@@ -207,7 +207,7 @@ export const reactivateSubscription = onRequest({
     try {
       const authHeader = req.headers.authorization;
       if (!authHeader?.startsWith("Bearer ")) {
-        res.status(401).json({ error: "Unauthorized" });
+        res.status(401).json({error: "Unauthorized"});
         return;
       }
 
@@ -220,7 +220,7 @@ export const reactivateSubscription = onRequest({
       const stripeCustomerId = customerIdRef.val();
 
       if (!stripeCustomerId) {
-        res.status(404).json({ error: "No Stripe customer found" });
+        res.status(404).json({error: "No Stripe customer found"});
         return;
       }
 
@@ -236,7 +236,7 @@ export const reactivateSubscription = onRequest({
       });
 
       if (subscriptions.data.length === 0) {
-        res.status(404).json({ error: "No active subscription found" });
+        res.status(404).json({error: "No active subscription found"});
         return;
       }
 
@@ -249,10 +249,10 @@ export const reactivateSubscription = onRequest({
         .ref(`users/${uid}/subscriptionStatus`)
         .set("subscribed");
 
-      res.json({ success: true });
+      res.json({success: true});
     } catch (error) {
       console.error("Error reactivating subscription:", error);
-      res.status(500).json({ error: "Failed to reactivate subscription" });
+      res.status(500).json({error: "Failed to reactivate subscription"});
     }
   });
 });
@@ -284,76 +284,76 @@ export const stripeWebhook = onRequest({
 
     // Handle the event
     switch (event.type) {
-      case "checkout.session.completed": {
-        const session = event.data.object as Stripe.Checkout.Session;
-        const uid = session.client_reference_id;
+    case "checkout.session.completed": {
+      const session = event.data.object as Stripe.Checkout.Session;
+      const uid = session.client_reference_id;
 
-        if (uid) {
-          await admin.database()
-            .ref(`users/${uid}/subscriptionStatus`)
-            .set("subscribed");
-        }
-        break;
+      if (uid) {
+        await admin.database()
+          .ref(`users/${uid}/subscriptionStatus`)
+          .set("subscribed");
       }
-
-      case "customer.subscription.updated": {
-        const subscription = event.data.object as Stripe.Subscription;
-        const customerId = subscription.customer as string;
-
-        // Find user by Stripe customer ID
-        const usersRef = admin.database().ref("users");
-        const snapshot = await usersRef
-          .orderByChild("stripeCustomerId")
-          .equalTo(customerId)
-          .once("value");
-
-        if (snapshot.exists()) {
-          const users = snapshot.val();
-          const uid = Object.keys(users)[0];
-
-          let status: string;
-          const isCancelling = subscription.cancel_at_period_end;
-          if (subscription.status === "active" && isCancelling) {
-            status = "pending_cancellation";
-          } else if (subscription.status === "active") {
-            status = "subscribed";
-          } else {
-            status = "unsubscribed";
-          }
-
-          await admin.database()
-            .ref(`users/${uid}/subscriptionStatus`)
-            .set(status);
-        }
-        break;
-      }
-
-      case "customer.subscription.deleted": {
-        const subscription = event.data.object as Stripe.Subscription;
-        const customerId = subscription.customer as string;
-
-        const usersRef = admin.database().ref("users");
-        const snapshot = await usersRef
-          .orderByChild("stripeCustomerId")
-          .equalTo(customerId)
-          .once("value");
-
-        if (snapshot.exists()) {
-          const users = snapshot.val();
-          const uid = Object.keys(users)[0];
-
-          await admin.database()
-            .ref(`users/${uid}/subscriptionStatus`)
-            .set("unsubscribed");
-        }
-        break;
-      }
-
-      default:
-        console.log(`Unhandled event type: ${event.type}`);
+      break;
     }
 
-    res.json({ received: true });
+    case "customer.subscription.updated": {
+      const subscription = event.data.object as Stripe.Subscription;
+      const customerId = subscription.customer as string;
+
+      // Find user by Stripe customer ID
+      const usersRef = admin.database().ref("users");
+      const snapshot = await usersRef
+        .orderByChild("stripeCustomerId")
+        .equalTo(customerId)
+        .once("value");
+
+      if (snapshot.exists()) {
+        const users = snapshot.val();
+        const uid = Object.keys(users)[0];
+
+        let status: string;
+        const isCancelling = subscription.cancel_at_period_end;
+        if (subscription.status === "active" && isCancelling) {
+          status = "pending_cancellation";
+        } else if (subscription.status === "active") {
+          status = "subscribed";
+        } else {
+          status = "unsubscribed";
+        }
+
+        await admin.database()
+          .ref(`users/${uid}/subscriptionStatus`)
+          .set(status);
+      }
+      break;
+    }
+
+    case "customer.subscription.deleted": {
+      const subscription = event.data.object as Stripe.Subscription;
+      const customerId = subscription.customer as string;
+
+      const usersRef = admin.database().ref("users");
+      const snapshot = await usersRef
+        .orderByChild("stripeCustomerId")
+        .equalTo(customerId)
+        .once("value");
+
+      if (snapshot.exists()) {
+        const users = snapshot.val();
+        const uid = Object.keys(users)[0];
+
+        await admin.database()
+          .ref(`users/${uid}/subscriptionStatus`)
+          .set("unsubscribed");
+      }
+      break;
+    }
+
+    default:
+      console.log(`Unhandled event type: ${event.type}`);
+    }
+
+    res.json({received: true});
   } catch (error) {
     console.error("Webhook error:", error);
     const errorMsg = error instanceof Error ?
