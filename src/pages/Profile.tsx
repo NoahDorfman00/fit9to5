@@ -16,6 +16,7 @@ const Profile: React.FC = () => {
     const [checkoutLoading, setCheckoutLoading] = useState(false);
     const [showCancelDialog, setShowCancelDialog] = useState(false);
     const [cancelling, setCancelling] = useState(false);
+    const [portalLoading, setPortalLoading] = useState(false);
 
     useEffect(() => {
         if (user) {
@@ -107,6 +108,34 @@ const Profile: React.FC = () => {
             console.error('Cancel subscription error:', err);
         } finally {
             setCancelling(false);
+        }
+    };
+
+    const handleManageBilling = async () => {
+        if (!user) return;
+        setPortalLoading(true);
+        setError(null);
+        try {
+            const idToken = await user.getIdToken();
+
+            const response = await fetch('https://us-central1-fit9to5.cloudfunctions.net/createPortalSession', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${idToken}`,
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to open billing portal');
+            }
+
+            const { url } = await response.json();
+            window.location.href = url;
+        } catch (err: any) {
+            setError(err.message || 'Failed to open billing portal.');
+            setPortalLoading(false);
         }
     };
 
@@ -210,7 +239,7 @@ const Profile: React.FC = () => {
                             </Button>
                         </Box>
                     ) : subscriptionStatus === 'pending_cancellation' ? (
-                        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1.5, mt: 2 }}>
                             <Button
                                 variant="contained"
                                 color="primary"
@@ -220,9 +249,27 @@ const Profile: React.FC = () => {
                             >
                                 {cancelling ? <CircularProgress size={24} /> : 'Keep Subscription'}
                             </Button>
+                            <Button
+                                variant="outlined"
+                                color="primary"
+                                onClick={handleManageBilling}
+                                disabled={portalLoading}
+                                sx={{ px: 4, py: 1.5, borderRadius: 3, fontWeight: 700 }}
+                            >
+                                {portalLoading ? <CircularProgress size={24} /> : 'Manage Billing'}
+                            </Button>
                         </Box>
                     ) : (
-                        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2 }}>
+                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 1.5, mt: 2 }}>
+                            <Button
+                                variant="outlined"
+                                color="primary"
+                                onClick={handleManageBilling}
+                                disabled={portalLoading}
+                                sx={{ px: 4, py: 1.5, borderRadius: 3, fontWeight: 700 }}
+                            >
+                                {portalLoading ? <CircularProgress size={24} /> : 'Manage Billing'}
+                            </Button>
                             <Button
                                 variant="outlined"
                                 color="error"

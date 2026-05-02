@@ -257,7 +257,62 @@ export const reactivateSubscription = onRequest({
   });
 });
 
-// 4. Stripe Webhook Handler
+// 4. Create Customer Portal Session
+export const createPortalSession = onRequest({
+  secrets: [stripeSecretKey],
+  cors: false,
+  region: "us-central1",
+}, async (req, res) => {
+  if (req.method === "OPTIONS") {
+    res.set("Access-Control-Allow-Origin", req.headers.origin || "https://fit9to5.com");
+    res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+    res.set("Access-Control-Allow-Headers", "Content-Type, Authorization");
+    res.set("Access-Control-Allow-Credentials", "true");
+    res.status(204).send("");
+    return;
+  }
+
+  return corsHandler(req, res, async () => {
+    try {
+      const authHeader = req.headers.authorization;
+      if (!authHeader?.startsWith("Bearer ")) {
+        res.status(401).json({error: "Unauthorized"});
+        return;
+      }
+
+      const idToken = authHeader.split("Bearer ")[1];
+      const decodedToken = await admin.auth().verifyIdToken(idToken);
+      const uid = decodedToken.uid;
+
+      const customerIdRef = await admin.database()
+        .ref(`users/${uid}/stripeCustomerId`).get();
+      const stripeCustomerId = customerIdRef.val();
+
+      if (!stripeCustomerId) {
+        res.status(404).json({error: "No Stripe customer found"});
+        return;
+      }
+
+      const stripe = new Stripe(stripeSecretKey.value(), {
+        apiVersion: "2025-04-30.basil" as Stripe.LatestApiVersion,
+        typescript: true,
+      });
+
+      const origin = req.headers.origin || "http://localhost:3000";
+      const session = await stripe.billingPortal.sessions.create({
+        customer: stripeCustomerId,
+        return_url: `${origin}/profile`,
+      });
+
+      res.json({url: session.url});
+    } catch (error) {
+      console.error("Error creating portal session:", error);
+      res.status(500).json({error: "Failed to create portal session"});
+    }
+  });
+});
+
+// 5. Stripe Webhook Handler
 export const stripeWebhook = onRequest({
   secrets: [stripeSecretKey, stripeWebhookSecret],
   cors: false,
