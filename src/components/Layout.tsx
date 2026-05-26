@@ -35,13 +35,21 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                     </Box>
                     {/* Desktop Menu */}
                     <Box sx={{ display: { xs: 'none', sm: 'flex' }, alignItems: 'center', gap: 2 }}>
-                        <Button 
-                            color="primary" 
-                            component={Link} 
-                            to="/macros" 
+                        <Button
+                            color="primary"
+                            component={Link}
+                            to="/macros"
                             sx={{ textTransform: 'none', fontWeight: 700, fontSize: 16 }}
                         >
                             Macro Calculator
+                        </Button>
+                        <Button
+                            color="primary"
+                            component={Link}
+                            to="/shop"
+                            sx={{ textTransform: 'none', fontWeight: 700, fontSize: 16 }}
+                        >
+                            Shop
                         </Button>
                         {loading ? (
                             <CircularProgress color="primary" size={24} />
@@ -70,6 +78,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
                                 <List>
                                     <ListItem button component={Link} to="/macros">
                                         <ListItemText primary="Macro Calculator" />
+                                    </ListItem>
+                                    <Divider />
+                                    <ListItem button component={Link} to="/shop">
+                                        <ListItemText primary="Shop" />
                                     </ListItem>
                                     <Divider />
                                     {loading ? (
