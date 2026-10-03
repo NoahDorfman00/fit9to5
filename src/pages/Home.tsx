@@ -1,14 +1,68 @@
 import React, { useState, useEffect } from 'react';
-import { Box, Button, Typography, Container, Grid, Card, CardContent, CircularProgress } from '@mui/material';
-import { useNavigate } from 'react-router-dom';
+import { Box, Button, Typography, CircularProgress } from '@mui/material';
+import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { database } from '../services/firebase';
 import { ref, get } from 'firebase/database';
 import { loadStripe } from '@stripe/stripe-js';
-import FitnessCenterIcon from '@mui/icons-material/FitnessCenter';
-import AccessTimeIcon from '@mui/icons-material/AccessTime';
-import PsychologyIcon from '@mui/icons-material/Psychology';
-import RestaurantIcon from '@mui/icons-material/Restaurant';
+import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import CheckIcon from '@mui/icons-material/Check';
+import ClockDial from '../components/ClockDial';
+import { colors, headingFont } from '../theme';
+
+const FEATURES = [
+    { title: 'Personalized Fitness', body: 'Custom workout plans that fit your schedule and fitness level.' },
+    { title: 'Nutrition Guidance', body: 'Meal plans and nutrition advice that complement your training and fit your lifestyle, so your diet supports muscle growth, fat loss, recovery, and overall well-being.' },
+    { title: 'Mindset Coaching', body: 'Build sustainable habits and overcome mental barriers.' },
+    { title: 'Flexible Schedule', body: 'Work at your own pace with 24/7 access to your coach.' },
+];
+
+const STEPS = [
+    { title: 'Tell us about your week', body: 'Share your schedule, your goals and how you like to train.' },
+    { title: 'Get your plan', body: 'Your coach builds workouts and meals around your calendar, not the other way round.' },
+    { title: 'Check in, anytime', body: 'Message your coach 24/7 and adjust as your week changes.' },
+];
+
+const PLAN_INCLUDES = [
+    'Personalized workout plans',
+    'Meal plans and nutrition guidance',
+    'Mindset and habit coaching',
+    '24/7 access to your coach',
+    'Cancel anytime from your profile',
+];
+
+const PRICE = '$49.99';
+
+const TESTIMONIALS = [
+    {
+        name: 'Lauren',
+        detail: 'Training with Noah for two years',
+        quote: 'In the past two years that I’ve been working out with Noah, I’ve seen so much growth in myself — both physically and mentally. I’m not only the strongest that I’ve ever been, but he helped me fall in love with the process. Going to the gym isn’t a chore to me anymore. Noah keeps me on track and pushes me in the gym, but will also share a piece of cake with me every so often. It’s really all about balance.',
+    },
+];
+
+// Example output shown in the calculator promo: 180*4 + 210*4 + 70*9 = 2,190 kcal.
+const EXAMPLE_MACROS = [
+    { grams: 180, label: 'Protein' },
+    { grams: 210, label: 'Carbs' },
+    { grams: 70, label: 'Fat' },
+];
+
+const container = { maxWidth: 1240, mx: 'auto', px: 3 };
+
+const displaySx = {
+    fontFamily: headingFont,
+    fontWeight: 900,
+    textTransform: 'uppercase',
+    lineHeight: 0.92,
+    m: 0,
+} as const;
+
+const sectionTitleSx = { ...displaySx, fontSize: { xs: 44, md: 72 } };
+
+const eyebrowSx = { fontSize: 14, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase' } as const;
+
+const ctaSx = { px: 3.75, py: 2, fontSize: 17, fontWeight: 800 };
 
 type SubscriptionStatus = 'subscribed' | 'pending_cancellation' | 'unsubscribed';
 
@@ -94,237 +148,247 @@ const Home: React.FC = () => {
         }
     };
 
+    const isMember = !!user && ['subscribed', 'pending_cancellation'].includes(subscriptionStatus);
+    const ctaLabel = isMember ? 'View My Profile' : user ? 'Subscribe Now' : 'Get Started';
+
+    const renderCta = (sx: object = {}) => (
+        <>
+            <Button
+                variant="contained"
+                color="secondary"
+                disableElevation
+                onClick={handleGetStarted}
+                disabled={checkoutLoading}
+                endIcon={checkoutLoading ? undefined : <ArrowForwardIcon />}
+                sx={{ ...ctaSx, ...sx }}
+            >
+                {checkoutLoading ? <CircularProgress size={24} sx={{ color: colors.navy }} /> : ctaLabel}
+            </Button>
+            {error && (
+                <Typography sx={{ color: '#FF8A80', fontWeight: 600, width: '100%' }}>
+                    {error}
+                </Typography>
+            )}
+        </>
+    );
+
     return (
-        <Box sx={{
-            minHeight: 'calc(100vh - 120px)',
-            background: '#ffffff',
-        }}>
-            {/* Hero Section */}
-            <Container maxWidth="lg" sx={{ pt: { xs: 6, md: 10 }, pb: { xs: 6, md: 8 } }}>
-                <Box sx={{ textAlign: 'center', mb: 8 }}>
-                    <Typography
-                        variant="h2"
-                        component="h1"
-                        gutterBottom
-                        sx={{
-                            fontWeight: 800,
-                            color: 'primary.main',
-                            fontSize: { xs: '2.5rem', md: '3.75rem' },
-                            letterSpacing: '-0.02em',
-                            mb: 3
-                        }}
-                    >
-                        Get Fit on Your Time
-                    </Typography>
-                    <Typography
-                        variant="h5"
-                        sx={{
-                            color: 'text.secondary',
-                            mb: 5,
-                            fontSize: { xs: '1.25rem', md: '1.5rem' },
-                            maxWidth: 800,
-                            mx: 'auto',
-                            lineHeight: 1.6
-                        }}
-                    >
-                        Personalized lifestyle coaching designed for busy professionals.
-                        Balance fitness, nutrition, and wellness without sacrificing your career.
-                    </Typography>
-                    <Button
-                        variant="contained"
-                        size="large"
-                        onClick={handleGetStarted}
-                        disabled={checkoutLoading}
-                        sx={{
-                            px: 6,
-                            py: 2,
-                            fontSize: '1.25rem',
-                            fontWeight: 700,
-                            borderRadius: 3,
-                            textTransform: 'none',
-                            boxShadow: '0 8px 32px rgba(25,194,178,0.25)',
-                            '&:hover': {
-                                boxShadow: '0 12px 40px rgba(25,194,178,0.35)',
-                            }
-                        }}
-                    >
-                        {checkoutLoading ? (
-                            <CircularProgress size={28} sx={{ color: 'white' }} />
-                        ) : ['subscribed', 'pending_cancellation'].includes(subscriptionStatus) && user ? (
-                            'View My Profile'
-                        ) : user ? (
-                            'Subscribe Now'
-                        ) : (
-                            'Get Started'
-                        )}
-                    </Button>
-                    {error && (
-                        <Typography color="error" sx={{ mt: 2 }}>
-                            {error}
+        <Box sx={{ bgcolor: colors.navy, color: '#fff', overflowX: 'hidden' }}>
+            {/* Hero */}
+            <Box component="section" sx={{ borderBottom: `1px solid ${colors.line}` }}>
+                <Box sx={{ ...container, pt: { xs: 7, md: 10 }, pb: { xs: 8, md: 12 }, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 7 }}>
+                    <Box sx={{ flex: '1 1 520px', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 3.5 }}>
+                        <Box sx={{ ...eyebrowSx, display: 'flex', alignItems: 'center', gap: 1.5, color: colors.brand }}>
+                            <Box component="span" sx={{ width: 32, height: 2, bgcolor: colors.brand }} />
+                            Coaching for busy professionals
+                        </Box>
+                        <Typography component="h1" sx={{ ...displaySx, fontSize: 'clamp(64px, 9vw, 136px)', lineHeight: 0.88 }}>
+                            Get fit on<br />
+                            <Box component="span" sx={{ color: colors.brand }}>your time.</Box>
                         </Typography>
-                    )}
+                        <Typography sx={{ maxWidth: 520, fontSize: { xs: 18, md: 19 }, lineHeight: 1.6, color: colors.muted }}>
+                            Personalized lifestyle coaching designed for busy professionals.
+                            Balance fitness, nutrition, and wellness without sacrificing your career.
+                        </Typography>
+                        <Box sx={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 1.5 }}>
+                            {renderCta()}
+                            <Button
+                                component={Link}
+                                to="/macros"
+                                variant="outlined"
+                                sx={{ ...ctaSx, fontWeight: 700, color: '#fff', borderWidth: 2, borderColor: colors.lineStrong, '&:hover': { borderWidth: 2, borderColor: colors.brand, bgcolor: 'transparent' } }}
+                            >
+                                Free macro calculator
+                            </Button>
+                        </Box>
+                    </Box>
+                    <Box sx={{ flex: '1 1 360px', minWidth: 0, maxWidth: 460, mx: 'auto', display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        <ClockDial />
+                        <Typography sx={{ textAlign: 'center', fontSize: 15, color: colors.muted }}>
+                            Your plan lives in the blue part of the clock.
+                        </Typography>
+                    </Box>
                 </Box>
+            </Box>
 
-                {/* Features Grid */}
-                <Grid container spacing={4} sx={{ mt: 4 }}>
-                    <Grid item xs={12} md={6} lg={3}>
-                        <Card
-                            sx={{
-                                height: '100%',
-                                borderRadius: 4,
-                                boxShadow: '0 4px 24px 0 rgba(0,0,0,0.08)',
-                                transition: 'all 0.3s ease',
-                                '&:hover': {
-                                    transform: 'translateY(-8px)',
-                                    boxShadow: '0 12px 32px 0 rgba(0,191,255,0.15)',
-                                }
-                            }}
+            {/* Features */}
+            <Box component="section" sx={{ py: { xs: 9, md: 13 } }}>
+                <Box sx={{ ...container, display: 'flex', flexDirection: 'column', gap: 7 }}>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'flex-end', columnGap: 6, rowGap: 2 }}>
+                        <Typography component="h2" sx={{ ...sectionTitleSx, maxWidth: 700 }}>
+                            Coaching that fits <Box component="span" sx={{ color: colors.brand }}>between meetings.</Box>
+                        </Typography>
+                        <Typography sx={{ maxWidth: 360, fontSize: 17, lineHeight: 1.6, color: colors.muted }}>
+                            One coach, one plan, built around the calendar you already have.
+                        </Typography>
+                    </Box>
+                    <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', borderTop: `1px solid ${colors.line}` }}>
+                        {FEATURES.map((f, i) => (
+                            <Box component="article" key={f.title} sx={{ py: 4, pr: 3.5, borderBottom: `1px solid ${colors.line}`, display: 'flex', flexDirection: 'column', gap: 1.75 }}>
+                                <Box component="span" sx={{ fontFamily: headingFont, fontWeight: 900, fontSize: 56, lineHeight: 1, color: colors.brand }}>
+                                    {String(i + 1).padStart(2, '0')}
+                                </Box>
+                                <Typography component="h3" sx={{ fontFamily: headingFont, fontWeight: 800, fontSize: 28, textTransform: 'uppercase', letterSpacing: '0.01em' }}>
+                                    {f.title}
+                                </Typography>
+                                <Typography sx={{ fontSize: 16, lineHeight: 1.6, color: colors.muted }}>
+                                    {f.body}
+                                </Typography>
+                            </Box>
+                        ))}
+                    </Box>
+                </Box>
+            </Box>
+
+            {/* How it works */}
+            <Box component="section" sx={{ bgcolor: colors.navyDeep, py: { xs: 9, md: 13 }, borderTop: `1px solid ${colors.line}`, borderBottom: `1px solid ${colors.line}` }}>
+                <Box sx={{ ...container, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <Typography component="h2" sx={sectionTitleSx}>How it works</Typography>
+                    <Box sx={{ display: 'flex', flexWrap: 'wrap', gap: 2.5 }}>
+                        {STEPS.map((s, i) => (
+                            <Box key={s.title} sx={{ flex: '1 1 300px', minWidth: 0, bgcolor: colors.surface, borderRadius: 1.5, borderTop: `4px solid ${colors.brand}`, p: 3.5, display: 'flex', flexDirection: 'column', gap: 1.75 }}>
+                                <Box component="span" sx={{ fontSize: 13, fontWeight: 800, letterSpacing: '0.14em', color: colors.brand }}>
+                                    STEP {String(i + 1).padStart(2, '0')}
+                                </Box>
+                                <Typography component="h3" sx={{ fontFamily: headingFont, fontWeight: 800, fontSize: 30, lineHeight: 1.05, textTransform: 'uppercase' }}>
+                                    {s.title}
+                                </Typography>
+                                <Typography sx={{ fontSize: 16, lineHeight: 1.6, color: colors.muted }}>
+                                    {s.body}
+                                </Typography>
+                            </Box>
+                        ))}
+                    </Box>
+                </Box>
+            </Box>
+
+            {/* Macro calculator promo */}
+            <Box component="section" sx={{ bgcolor: colors.brand, color: colors.navy }}>
+                <Box sx={{ ...container, py: { xs: 8, md: 11 }, display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
+                    <Box sx={{ flex: '1 1 460px', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2.25 }}>
+                        <Box sx={eyebrowSx}>Free tool · No account needed</Box>
+                        <Typography component="h2" sx={{ ...displaySx, fontSize: { xs: 52, md: 88 }, lineHeight: 0.9 }}>
+                            Know your numbers.
+                        </Typography>
+                        <Typography sx={{ maxWidth: 460, fontSize: 18, lineHeight: 1.6, fontWeight: 500 }}>
+                            Get a protein, carb and fat split for your goal in about 30 seconds.
+                        </Typography>
+                        <Button
+                            component={Link}
+                            to="/macros"
+                            variant="contained"
+                            disableElevation
+                            sx={{ ...ctaSx, alignSelf: 'flex-start', bgcolor: colors.navy, color: '#fff', '&:hover': { bgcolor: colors.surface } }}
                         >
-                            <CardContent sx={{ textAlign: 'center', py: 4 }}>
-                                <FitnessCenterIcon sx={{ fontSize: 60, color: 'primary.main', mb: 2 }} />
-                                <Typography variant="h6" gutterBottom sx={{ fontWeight: 700, color: 'primary.main' }}>
-                                    Personalized Fitness
-                                </Typography>
-                                <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.7 }}>
-                                    Custom workout plans that fit your schedule and fitness level
-                                </Typography>
-                            </CardContent>
-                        </Card>
-                    </Grid>
+                            Open the Macro Calculator
+                        </Button>
+                    </Box>
+                    <Box sx={{ flex: '0 1 420px', minWidth: 0 }}>
+                        <Box sx={eyebrowSx}>Example result</Box>
+                        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 1.5, mt: 1.5 }}>
+                            {EXAMPLE_MACROS.map((m) => (
+                                <Box key={m.label} sx={{ bgcolor: colors.navy, color: '#fff', borderRadius: 1.5, px: 2, py: 2.5 }}>
+                                    <Box sx={{ fontFamily: headingFont, fontWeight: 900, fontSize: { xs: 40, sm: 48 }, lineHeight: 1 }}>
+                                        {m.grams}<Box component="span" sx={{ fontSize: 22, color: colors.brand }}>g</Box>
+                                    </Box>
+                                    <Box sx={{ mt: 0.75, fontSize: 13, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: colors.muted }}>
+                                        {m.label}
+                                    </Box>
+                                </Box>
+                            ))}
+                        </Box>
+                        <Box sx={{ mt: 1.5, fontFamily: headingFont, fontWeight: 800, fontSize: 26, textTransform: 'uppercase' }}>
+                            = 2,190 kcal / day
+                        </Box>
+                    </Box>
+                </Box>
+            </Box>
 
-                    <Grid item xs={12} md={6} lg={3}>
-                        <Card
-                            sx={{
-                                height: '100%',
-                                borderRadius: 4,
-                                boxShadow: '0 4px 24px 0 rgba(0,0,0,0.08)',
-                                transition: 'all 0.3s ease',
-                                '&:hover': {
-                                    transform: 'translateY(-8px)',
-                                    boxShadow: '0 12px 32px 0 rgba(0,191,255,0.15)',
-                                }
-                            }}
-                        >
-                            <CardContent sx={{ textAlign: 'center', py: 4 }}>
-                                <RestaurantIcon sx={{ fontSize: 60, color: 'primary.main', mb: 2 }} />
-                                <Typography variant="h6" gutterBottom sx={{ fontWeight: 700, color: 'primary.main' }}>
-                                    Nutrition Guidance
-                                </Typography>
-                                <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.7 }}>
-                                    Meal plans and nutrition advice tailored to your lifestyle
-                                </Typography>
-                            </CardContent>
-                        </Card>
-                    </Grid>
-
-                    <Grid item xs={12} md={6} lg={3}>
-                        <Card
-                            sx={{
-                                height: '100%',
-                                borderRadius: 4,
-                                boxShadow: '0 4px 24px 0 rgba(0,0,0,0.08)',
-                                transition: 'all 0.3s ease',
-                                '&:hover': {
-                                    transform: 'translateY(-8px)',
-                                    boxShadow: '0 12px 32px 0 rgba(0,191,255,0.15)',
-                                }
-                            }}
-                        >
-                            <CardContent sx={{ textAlign: 'center', py: 4 }}>
-                                <PsychologyIcon sx={{ fontSize: 60, color: 'primary.main', mb: 2 }} />
-                                <Typography variant="h6" gutterBottom sx={{ fontWeight: 700, color: 'primary.main' }}>
-                                    Mindset Coaching
-                                </Typography>
-                                <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.7 }}>
-                                    Build sustainable habits and overcome mental barriers
-                                </Typography>
-                            </CardContent>
-                        </Card>
-                    </Grid>
-
-                    <Grid item xs={12} md={6} lg={3}>
-                        <Card
-                            sx={{
-                                height: '100%',
-                                borderRadius: 4,
-                                boxShadow: '0 4px 24px 0 rgba(0,0,0,0.08)',
-                                transition: 'all 0.3s ease',
-                                '&:hover': {
-                                    transform: 'translateY(-8px)',
-                                    boxShadow: '0 12px 32px 0 rgba(0,191,255,0.15)',
-                                }
-                            }}
-                        >
-                            <CardContent sx={{ textAlign: 'center', py: 4 }}>
-                                <AccessTimeIcon sx={{ fontSize: 60, color: 'primary.main', mb: 2 }} />
-                                <Typography variant="h6" gutterBottom sx={{ fontWeight: 700, color: 'primary.main' }}>
-                                    Flexible Schedule
-                                </Typography>
-                                <Typography variant="body2" sx={{ color: 'text.secondary', lineHeight: 1.7 }}>
-                                    Work at your own pace with 24/7 access to your coach
-                                </Typography>
-                            </CardContent>
-                        </Card>
-                    </Grid>
-                </Grid>
-
-                {/* CTA Section */}
-                <Box sx={{ textAlign: 'center', mt: 10, mb: 6 }}>
-                    <Typography
-                        variant="h4"
-                        gutterBottom
-                        sx={{
-                            fontWeight: 700,
-                            color: 'primary.main',
-                            mb: 3
-                        }}
-                    >
-                        Ready to Transform Your Life?
+            {/* Testimonials */}
+            <Box component="section" sx={{ py: { xs: 9, md: 13 } }}>
+                <Box sx={{ ...container, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                    <Typography component="h2" sx={sectionTitleSx}>
+                        From people with <Box component="span" sx={{ color: colors.brand }}>full calendars.</Box>
                     </Typography>
-                    <Typography
-                        variant="body1"
-                        sx={{
-                            color: 'text.secondary',
-                            mb: 4,
-                            fontSize: '1.125rem',
-                            maxWidth: 600,
-                            mx: 'auto'
-                        }}
-                    >
+                    <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 2.5 }}>
+                        {TESTIMONIALS.map((t) => (
+                            <Box component="figure" key={t.name} sx={{ m: 0, p: { xs: 3.5, md: 5 }, borderRadius: 1.5, bgcolor: colors.surface, display: 'flex', flexDirection: 'column', gap: 3 }}>
+                                <Box component="span" aria-hidden="true" sx={{ fontFamily: headingFont, fontWeight: 900, fontSize: 96, lineHeight: 0.6, color: colors.brand }}>
+                                    “
+                                </Box>
+                                <Box component="blockquote" sx={{ m: 0, fontSize: { xs: 18, md: TESTIMONIALS.length === 1 ? 24 : 18 }, lineHeight: 1.6, color: '#E6EDF3', maxWidth: 900 }}>
+                                    {t.quote}
+                                </Box>
+                                <Box component="figcaption" sx={{ mt: 'auto', fontSize: 15, color: colors.muted }}>
+                                    <Box component="strong" sx={{ color: '#fff' }}>{t.name}</Box> · {t.detail}
+                                </Box>
+                            </Box>
+                        ))}
+                    </Box>
+                </Box>
+            </Box>
+
+            {/* Pricing */}
+            <Box component="section" sx={{ bgcolor: colors.mist, color: colors.navy, py: { xs: 9, md: 13 } }}>
+                <Box sx={{ ...container, display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
+                    <Box sx={{ flex: '1 1 420px', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                        <Box sx={{ ...eyebrowSx, color: 'primary.main' }}>Membership</Box>
+                        <Typography component="h2" sx={sectionTitleSx}>
+                            One plan.<br />Everything in.
+                        </Typography>
+                        <Typography sx={{ maxWidth: 420, fontSize: 17, lineHeight: 1.6, color: 'text.secondary' }}>
+                            Fitness, nutrition and mindset coaching in a single monthly subscription.
+                        </Typography>
+                    </Box>
+                    <Box sx={{ flex: '1 1 400px', minWidth: 0, maxWidth: 480, bgcolor: colors.navy, color: '#fff', borderRadius: 2, p: { xs: 3.5, sm: 4.5 }, display: 'flex', flexDirection: 'column', gap: 3, boxShadow: '0 24px 56px rgba(11,27,43,0.25)' }}>
+                        <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: 1.5 }}>
+                            <Typography component="h3" sx={{ fontFamily: headingFont, fontWeight: 800, fontSize: 28, textTransform: 'uppercase' }}>
+                                FIT 9to5 Coaching
+                            </Typography>
+                            <img src="/assets/logo.png" alt="" style={{ width: 32, height: 32 }} />
+                        </Box>
+                        <Box sx={{ display: 'flex', alignItems: 'baseline', gap: 0.75 }}>
+                            <Box component="span" sx={{ fontFamily: headingFont, fontWeight: 900, fontSize: 64, lineHeight: 1 }}>
+                                {PRICE}
+                            </Box>
+                            <Box component="span" sx={{ fontSize: 16, color: colors.muted }}>/month</Box>
+                        </Box>
+                        <Box component="ul" sx={{ m: 0, p: 0, listStyle: 'none', display: 'flex', flexDirection: 'column', gap: 1.5, fontSize: 16, color: '#E6EDF3' }}>
+                            {PLAN_INCLUDES.map((item) => (
+                                <Box component="li" key={item} sx={{ display: 'flex', alignItems: 'center', gap: 1.25 }}>
+                                    <CheckIcon sx={{ color: colors.brand, fontSize: 22 }} />
+                                    {item}
+                                </Box>
+                            ))}
+                        </Box>
+                        {renderCta({ width: '100%' })}
+                    </Box>
+                </Box>
+            </Box>
+
+            {/* Closing CTA */}
+            <Box component="section" sx={{ position: 'relative', overflow: 'hidden', py: { xs: 11, md: 15 }, px: 3 }}>
+                <Box
+                    component="svg"
+                    aria-hidden="true"
+                    viewBox="0 0 200 200"
+                    sx={{ position: 'absolute', left: '50%', top: '50%', width: 760, height: 760, ml: '-380px', mt: '-380px' }}
+                >
+                    <circle cx="100" cy="100" r="88" fill="none" stroke={colors.surface} strokeWidth="18" />
+                    <path d="M100 100 L150 186.6 A100 100 0 0 1 0 100 Z" fill={colors.surface} />
+                </Box>
+                <Box sx={{ position: 'relative', maxWidth: 900, mx: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 3 }}>
+                    <Typography component="h2" sx={{ ...displaySx, fontSize: 'clamp(52px, 7vw, 104px)', lineHeight: 0.9 }}>
+                        Ready to transform <Box component="span" sx={{ color: colors.brand }}>your life?</Box>
+                    </Typography>
+                    <Typography sx={{ maxWidth: 520, fontSize: 18, lineHeight: 1.6, color: colors.muted }}>
                         Join FIT 9to5 today and start your journey to a healthier, more balanced lifestyle.
                     </Typography>
-                    <Button
-                        variant="contained"
-                        size="large"
-                        onClick={handleGetStarted}
-                        disabled={checkoutLoading}
-                        sx={{
-                            px: 6,
-                            py: 2,
-                            fontSize: '1.125rem',
-                            fontWeight: 700,
-                            borderRadius: 3,
-                            textTransform: 'none',
-                            boxShadow: '0 8px 32px rgba(0,191,255,0.25)',
-                            '&:hover': {
-                                boxShadow: '0 12px 40px rgba(0,191,255,0.35)',
-                            }
-                        }}
-                    >
-                        {checkoutLoading ? (
-                            <CircularProgress size={28} sx={{ color: 'white' }} />
-                        ) : ['subscribed', 'pending_cancellation'].includes(subscriptionStatus) && user ? (
-                            'View My Profile'
-                        ) : user ? (
-                            'Subscribe Now'
-                        ) : (
-                            'Get Started'
-                        )}
-                    </Button>
+                    {renderCta({ px: 4.5, py: 2.25, fontSize: 18 })}
                 </Box>
-            </Container>
+            </Box>
         </Box>
     );
 };
 
-export default Home; 
+export default Home;

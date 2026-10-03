@@ -14,22 +14,20 @@ const StyledPaper = styled(Paper)(({ theme }) => ({
     maxWidth: 540,
     width: '100%',
     margin: '0 auto',
-    borderRadius: 18,
-    boxShadow: '0 4px 24px 0 rgba(10, 60, 47, 0.08)',
 }));
 
 const StyledTextField = styled(TextField)(({ theme }) => ({
     '& .MuiOutlinedInput-root': {
-        borderRadius: 18,
+        borderRadius: theme.shape.borderRadius,
         '& fieldset': {
             borderWidth: 2,
-            borderColor: '#e0e0e0',
+            borderColor: theme.palette.divider,
         },
         '&:hover fieldset': {
-            borderColor: '#00BFFF',
+            borderColor: theme.palette.primary.main,
         },
         '&.Mui-focused fieldset': {
-            borderColor: '#00BFFF',
+            borderColor: theme.palette.primary.main,
         },
     },
     '& .MuiInputLabel-root': {
@@ -49,8 +47,8 @@ const StyledFormControlLabel = styled(FormControlLabel)(({ theme }) => ({
     '& .MuiFormControlLabel-label': {
         display: 'block',
         padding: '12px 16px',
-        border: '2px solid #e0e0e0',
-        borderRadius: 18,
+        border: `2px solid ${theme.palette.divider}`,
+        borderRadius: theme.shape.borderRadius,
         textAlign: 'center',
         cursor: 'pointer',
         transition: 'all 0.3s',
@@ -58,21 +56,21 @@ const StyledFormControlLabel = styled(FormControlLabel)(({ theme }) => ({
         fontSize: 14,
     },
     '&:has(.Mui-checked) .MuiFormControlLabel-label': {
-        background: '#00BFFF',
-        color: 'white',
-        borderColor: '#00BFFF',
+        background: theme.palette.primary.main,
+        color: theme.palette.primary.contrastText,
+        borderColor: theme.palette.primary.main,
     },
     '&:hover .MuiFormControlLabel-label': {
-        borderColor: '#00BFFF',
+        borderColor: theme.palette.primary.main,
     },
 }));
 
 const ResultsBox = styled(Box)(({ theme }) => ({
     marginTop: 30,
     padding: 25,
-    background: '#ffffff',
-    border: '2px solid #e0e0e0',
-    borderRadius: 18,
+    background: theme.palette.background.paper,
+    border: `2px solid ${theme.palette.divider}`,
+    borderRadius: 12,
     animation: 'slideIn 0.4s ease-out',
     '@keyframes slideIn': {
         from: {
@@ -87,18 +85,18 @@ const ResultsBox = styled(Box)(({ theme }) => ({
 const MathBox = styled(Box)(({ theme }) => ({
     marginTop: 16,
     padding: 16,
-    background: '#f8f9fa',
+    background: theme.palette.grey[50],
     borderRadius: 12,
     fontFamily: '"Roboto Mono", monospace',
     fontSize: 13,
     lineHeight: 1.8,
-    color: '#444',
+    color: theme.palette.text.secondary,
 }));
 
 const StyledTabs = styled(Tabs)(({ theme }) => ({
     marginBottom: 24,
     '& .MuiTabs-indicator': {
-        backgroundColor: '#00BFFF',
+        backgroundColor: theme.palette.primary.main,
         height: 3,
         borderRadius: 2,
     },
@@ -108,9 +106,9 @@ const StyledTab = styled(Tab)(({ theme }) => ({
     fontWeight: 700,
     fontSize: 14,
     textTransform: 'none',
-    color: '#888',
+    color: theme.palette.text.secondary,
     '&.Mui-selected': {
-        color: '#00BFFF',
+        color: theme.palette.primary.main,
     },
 }));
 
@@ -329,14 +327,14 @@ const Macros: React.FC = () => {
     };
 
     const renderMacroRow = (label: string, value: number, unit: string, showBorder: boolean = true) => (
-        <Box sx={{ mb: showBorder ? 1.5 : 0, pb: showBorder ? 1.5 : 0, borderBottom: showBorder ? '1px solid rgba(0,0,0,0.1)' : 'none' }}>
+        <Box sx={{ mb: showBorder ? 1.5 : 0, pb: showBorder ? 1.5 : 0, borderBottom: showBorder ? 1 : 0, borderColor: 'divider' }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography sx={{ color: '#333333', fontWeight: 700 }}>
+                <Typography sx={{ color: 'text.secondary', fontWeight: 700 }}>
                     {label}
                 </Typography>
-                <Typography sx={{ color: '#00BFFF', fontWeight: 700, fontSize: 18 }}>
+                <Typography sx={{ color: 'primary.main', fontWeight: 700, fontSize: 18 }}>
                     {value}{' '}
-                    <Box component="span" sx={{ fontSize: 14, color: '#888', fontWeight: 400 }}>
+                    <Box component="span" sx={{ fontSize: 14, color: 'text.secondary', fontWeight: 400 }}>
                         {unit}
                     </Box>
                 </Typography>
@@ -350,7 +348,7 @@ const Macros: React.FC = () => {
                 variant="h6"
                 sx={{
                     fontWeight: 700,
-                    color: '#000000',
+                    color: 'text.primary',
                     mb: 2.5,
                     fontSize: 22,
                     textAlign: 'center',
@@ -374,42 +372,42 @@ const Macros: React.FC = () => {
 
         return (
             <MathBox>
-                <Typography sx={{ fontWeight: 700, fontSize: 14, color: '#000', mb: 1.5, fontFamily: 'inherit' }}>
+                <Typography sx={{ fontWeight: 700, fontSize: 14, color: 'text.primary', mb: 1.5, fontFamily: 'inherit' }}>
                     How it's calculated
                 </Typography>
 
                 <Box sx={{ mb: 1.5 }}>
-                    <Typography sx={{ fontSize: 13, color: '#00BFFF', fontWeight: 700, mb: 0.5, fontFamily: 'inherit' }}>
+                    <Typography sx={{ fontSize: 13, color: 'primary.main', fontWeight: 700, mb: 0.5, fontFamily: 'inherit' }}>
                         Protein
                     </Typography>
-                    <Typography sx={{ fontSize: 13, fontFamily: '"Roboto Mono", monospace', color: '#444' }}>
+                    <Typography sx={{ fontSize: 13, fontFamily: '"Roboto Mono", monospace', color: 'text.secondary' }}>
                         {tw} lbs × {proteinRatio} g/lb = <strong>{advResults.protein}g</strong>
                     </Typography>
                 </Box>
 
                 <Box sx={{ mb: 1.5 }}>
-                    <Typography sx={{ fontSize: 13, color: '#00BFFF', fontWeight: 700, mb: 0.5, fontFamily: 'inherit' }}>
+                    <Typography sx={{ fontSize: 13, color: 'primary.main', fontWeight: 700, mb: 0.5, fontFamily: 'inherit' }}>
                         Fat
                     </Typography>
-                    <Typography sx={{ fontSize: 13, fontFamily: '"Roboto Mono", monospace', color: '#444' }}>
+                    <Typography sx={{ fontSize: 13, fontFamily: '"Roboto Mono", monospace', color: 'text.secondary' }}>
                         ({cals} cal × {fatPercent}%) / 9 kcal/g = <strong>{advResults.fat}g</strong>
                     </Typography>
                 </Box>
 
                 <Box sx={{ mb: 1.5 }}>
-                    <Typography sx={{ fontSize: 13, color: '#00BFFF', fontWeight: 700, mb: 0.5, fontFamily: 'inherit' }}>
+                    <Typography sx={{ fontSize: 13, color: 'primary.main', fontWeight: 700, mb: 0.5, fontFamily: 'inherit' }}>
                         Carbs
                     </Typography>
-                    <Typography sx={{ fontSize: 13, fontFamily: '"Roboto Mono", monospace', color: '#444' }}>
+                    <Typography sx={{ fontSize: 13, fontFamily: '"Roboto Mono", monospace', color: 'text.secondary' }}>
                         ({cals} cal − {advResults.fat}g fat × 9 kcal/g − {advResults.protein}g pro × 4 kcal/g) / 4 kcal/g = <strong>{advResults.carbs}g</strong>
                     </Typography>
                 </Box>
 
-                <Box sx={{ pt: 1, borderTop: '1px solid #ddd' }}>
-                    <Typography sx={{ fontSize: 13, color: '#00BFFF', fontWeight: 700, mb: 0.5, fontFamily: 'inherit' }}>
+                <Box sx={{ pt: 1, borderTop: 1, borderColor: 'divider' }}>
+                    <Typography sx={{ fontSize: 13, color: 'primary.main', fontWeight: 700, mb: 0.5, fontFamily: 'inherit' }}>
                         Verification
                     </Typography>
-                    <Typography sx={{ fontSize: 13, fontFamily: '"Roboto Mono", monospace', color: '#444' }}>
+                    <Typography sx={{ fontSize: 13, fontFamily: '"Roboto Mono", monospace', color: 'text.secondary' }}>
                         {advResults.protein}g × 4 kcal/g + {advResults.carbs}g × 4 kcal/g + {advResults.fat}g × 9 kcal/g = <strong>{advResults.totalCalories} kcal</strong>
                     </Typography>
                 </Box>
@@ -421,7 +419,7 @@ const Macros: React.FC = () => {
         <Box
             sx={{
                 minHeight: 'calc(100vh - 120px)',
-                background: '#ffffff',
+                bgcolor: 'background.default',
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
@@ -447,7 +445,7 @@ const Macros: React.FC = () => {
                             variant="h4"
                             sx={{
                                 fontWeight: 700,
-                                color: '#000000',
+                                color: 'text.primary',
                                 mb: 1,
                                 fontSize: 28,
                             }}
@@ -457,7 +455,7 @@ const Macros: React.FC = () => {
                         <Typography
                             variant="body2"
                             sx={{
-                                color: '#333333',
+                                color: 'text.secondary',
                                 mb: 1,
                                 fontSize: 14,
                             }}
@@ -510,7 +508,7 @@ const Macros: React.FC = () => {
                                         sx={{
                                             fontWeight: 700,
                                             fontSize: 14,
-                                            color: '#000000',
+                                            color: 'text.primary',
                                             mb: 1,
                                         }}
                                     >
@@ -554,15 +552,13 @@ const Macros: React.FC = () => {
                                                 startIcon={<ShareOutlinedIcon />}
                                                 onClick={handleShare}
                                                 sx={{
-                                                    borderRadius: 18,
-                                                    borderColor: '#00BFFF',
-                                                    color: '#00BFFF',
+                                                    borderColor: 'primary.main',
+                                                    color: 'primary.main',
                                                     fontWeight: 700,
                                                     textTransform: 'none',
                                                     px: 3,
                                                     '&:hover': {
-                                                        borderColor: '#00BFFF',
-                                                        backgroundColor: 'rgba(0, 191, 255, 0.06)',
+                                                        borderColor: 'primary.main',
                                                     },
                                                 }}
                                             >
@@ -611,13 +607,13 @@ const Macros: React.FC = () => {
                                         sx={{
                                             fontWeight: 700,
                                             fontSize: 14,
-                                            color: '#000000',
+                                            color: 'text.primary',
                                             mb: 0.5,
                                         }}
                                     >
                                         Protein Ratio
                                     </Typography>
-                                    <Typography sx={{ fontSize: 12, color: '#888', mb: 1 }}>
+                                    <Typography sx={{ fontSize: 12, color: 'text.secondary', mb: 1 }}>
                                         Grams of protein per pound of target weight (default: 1.0)
                                     </Typography>
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -631,7 +627,7 @@ const Macros: React.FC = () => {
                                             valueLabelFormat={(v) => `${v} g/lb`}
                                             sx={{
                                                 flex: 1,
-                                                color: '#00BFFF',
+                                                color: 'primary.main',
                                                 '& .MuiSlider-thumb': {
                                                     width: 20,
                                                     height: 20,
@@ -643,7 +639,7 @@ const Macros: React.FC = () => {
                                                 minWidth: 56,
                                                 fontWeight: 700,
                                                 fontSize: 14,
-                                                color: '#00BFFF',
+                                                color: 'primary.main',
                                                 textAlign: 'right',
                                             }}
                                         >
@@ -657,13 +653,13 @@ const Macros: React.FC = () => {
                                         sx={{
                                             fontWeight: 700,
                                             fontSize: 14,
-                                            color: '#000000',
+                                            color: 'text.primary',
                                             mb: 0.5,
                                         }}
                                     >
                                         Fat Percentage
                                     </Typography>
-                                    <Typography sx={{ fontSize: 12, color: '#888', mb: 1 }}>
+                                    <Typography sx={{ fontSize: 12, color: 'text.secondary', mb: 1 }}>
                                         Percentage of total calories from fat (default: 25%)
                                     </Typography>
                                     <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
@@ -677,7 +673,7 @@ const Macros: React.FC = () => {
                                             valueLabelFormat={(v) => `${v}%`}
                                             sx={{
                                                 flex: 1,
-                                                color: '#00BFFF',
+                                                color: 'primary.main',
                                                 '& .MuiSlider-thumb': {
                                                     width: 20,
                                                     height: 20,
@@ -689,7 +685,7 @@ const Macros: React.FC = () => {
                                                 minWidth: 40,
                                                 fontWeight: 700,
                                                 fontSize: 14,
-                                                color: '#00BFFF',
+                                                color: 'primary.main',
                                                 textAlign: 'right',
                                             }}
                                         >
@@ -708,15 +704,13 @@ const Macros: React.FC = () => {
                                                 startIcon={<ShareOutlinedIcon />}
                                                 onClick={handleShare}
                                                 sx={{
-                                                    borderRadius: 18,
-                                                    borderColor: '#00BFFF',
-                                                    color: '#00BFFF',
+                                                    borderColor: 'primary.main',
+                                                    color: 'primary.main',
                                                     fontWeight: 700,
                                                     textTransform: 'none',
                                                     px: 3,
                                                     '&:hover': {
-                                                        borderColor: '#00BFFF',
-                                                        backgroundColor: 'rgba(0, 191, 255, 0.06)',
+                                                        borderColor: 'primary.main',
                                                     },
                                                 }}
                                             >

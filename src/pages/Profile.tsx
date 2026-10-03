@@ -110,7 +110,7 @@ const Profile: React.FC = () => {
     if (!user) {
         return (
             <Box sx={{ maxWidth: 500, mx: 'auto', mt: { xs: 3, sm: 6 }, px: 1 }}>
-                <Paper elevation={3} sx={{ p: { xs: 2, sm: 4 }, borderRadius: 4, boxShadow: '0 4px 24px 0 rgba(0,0,0,0.10)', bgcolor: '#fff' }}>
+                <Paper elevation={3} sx={{ p: { xs: 2, sm: 4 } }}>
                     <Typography variant="h6" sx={{ textAlign: 'center' }}>
                         You must be logged in to view this page.
                     </Typography>
@@ -125,7 +125,7 @@ const Profile: React.FC = () => {
 
     return (
         <Box sx={{ maxWidth: 500, mx: 'auto', mt: { xs: 3, sm: 6 }, px: 1 }}>
-            <Paper elevation={3} sx={{ p: { xs: 2, sm: 4 }, borderRadius: 4, boxShadow: '0 4px 24px 0 rgba(10,60,47,0.10)', bgcolor: '#fff' }}>
+            <Paper elevation={3} sx={{ p: { xs: 2, sm: 4 } }}>
                 <Typography variant="h5" gutterBottom sx={{ fontWeight: 700, color: 'primary.main', textAlign: 'center' }}>
                     My Profile
                 </Typography>
@@ -172,7 +172,7 @@ const Profile: React.FC = () => {
                                 color="primary"
                                 onClick={handleCheckout}
                                 disabled={checkoutLoading}
-                                sx={{ px: 4, py: 1.5, borderRadius: 3, fontWeight: 700 }}
+                                sx={{ px: 4, py: 1.5, fontWeight: 700 }}
                             >
                                 {checkoutLoading ? <CircularProgress size={24} /> : 'Subscribe Now'}
                             </Button>
@@ -184,7 +184,7 @@ const Profile: React.FC = () => {
                                 color="primary"
                                 onClick={handleManageBilling}
                                 disabled={portalLoading}
-                                sx={{ px: 4, py: 1.5, borderRadius: 3, fontWeight: 700 }}
+                                sx={{ px: 4, py: 1.5, fontWeight: 700 }}
                             >
                                 {portalLoading ? <CircularProgress size={24} /> : 'Manage Billing'}
                             </Button>
