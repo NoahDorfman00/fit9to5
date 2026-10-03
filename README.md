@@ -7,7 +7,7 @@ Firebase for auth, data and the serverless bits. Live at
 [fit9to5.com](https://fit9to5.com).
 
 <p align="center">
-  <img src="public/assets/social.png" alt="FIT 9to5 social card: before-and-after transformation photos joined by an arrow with the FIT 9to5 logo" width="560">
+  <img src="public/assets/social.png" alt="FIT 9to5 social card: the headline Get fit on your time beside before-and-after transformation photos" width="560">
 </p>
 
 ## Why
