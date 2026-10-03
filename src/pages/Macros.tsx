@@ -8,12 +8,17 @@ import { styled } from '@mui/material/styles';
 import ShareOutlinedIcon from '@mui/icons-material/ShareOutlined';
 import { useSearchParams } from 'react-router-dom';
 import html2canvas from 'html2canvas';
+import MacroTiles from '../components/MacroTiles';
+import { colors, headingFont } from '../theme';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
     padding: 40,
     maxWidth: 540,
     width: '100%',
     margin: '0 auto',
+    [theme.breakpoints.down('sm')]: {
+        padding: 20,
+    },
 }));
 
 const StyledTextField = styled(TextField)(({ theme }) => ({
@@ -67,10 +72,13 @@ const StyledFormControlLabel = styled(FormControlLabel)(({ theme }) => ({
 
 const ResultsBox = styled(Box)(({ theme }) => ({
     marginTop: 30,
-    padding: 25,
-    background: theme.palette.background.paper,
-    border: `2px solid ${theme.palette.divider}`,
+    padding: 24,
+    background: colors.brand,
+    color: colors.navy,
     borderRadius: 12,
+    [theme.breakpoints.down('sm')]: {
+        padding: 16,
+    },
     animation: 'slideIn 0.4s ease-out',
     '@keyframes slideIn': {
         from: {
@@ -85,7 +93,7 @@ const ResultsBox = styled(Box)(({ theme }) => ({
 const MathBox = styled(Box)(({ theme }) => ({
     marginTop: 16,
     padding: 16,
-    background: theme.palette.grey[50],
+    background: theme.palette.background.paper,
     borderRadius: 12,
     fontFamily: '"Roboto Mono", monospace',
     fontSize: 13,
@@ -279,7 +287,7 @@ const Macros: React.FC = () => {
         if (resultsRef.current) {
             try {
                 const canvas = await html2canvas(resultsRef.current, {
-                    backgroundColor: '#ffffff',
+                    backgroundColor: colors.brand,
                     scale: 2,
                 });
                 const blob = await new Promise<Blob | null>((resolve) =>
@@ -326,41 +334,27 @@ const Macros: React.FC = () => {
         setSnackbarOpen(true);
     };
 
-    const renderMacroRow = (label: string, value: number, unit: string, showBorder: boolean = true) => (
-        <Box sx={{ mb: showBorder ? 1.5 : 0, pb: showBorder ? 1.5 : 0, borderBottom: showBorder ? 1 : 0, borderColor: 'divider' }}>
-            <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <Typography sx={{ color: 'text.secondary', fontWeight: 700 }}>
-                    {label}
-                </Typography>
-                <Typography sx={{ color: 'primary.main', fontWeight: 700, fontSize: 18 }}>
-                    {value}{' '}
-                    <Box component="span" sx={{ fontSize: 14, color: 'text.secondary', fontWeight: 400 }}>
-                        {unit}
-                    </Box>
-                </Typography>
-            </Box>
-        </Box>
-    );
-
     const renderResultsBlock = (data: MacroResults) => (
         <>
-            <Typography
-                variant="h6"
-                sx={{
-                    fontWeight: 700,
-                    color: 'text.primary',
-                    mb: 2.5,
-                    fontSize: 22,
-                    textAlign: 'center',
-                }}
-            >
-                Your Macro Split
+            <Typography sx={{ fontSize: 14, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', mb: 1.5 }}>
+                Your macro split
             </Typography>
-            {renderMacroRow('Total Calories', data.totalCalories, 'kcal')}
-            {renderMacroRow('Protein', data.protein, 'g')}
-            {renderMacroRow('Carbs', data.carbs, 'g')}
-            {renderMacroRow('Fat', data.fat, 'g', false)}
+            <MacroTiles {...data} />
         </>
+    );
+
+    const renderShareButton = () => (
+        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2.5 }} data-html2canvas-ignore>
+            <Button
+                variant="contained"
+                disableElevation
+                startIcon={<ShareOutlinedIcon />}
+                onClick={handleShare}
+                sx={{ px: 3, py: 1.25, fontWeight: 800, bgcolor: colors.navy, color: '#fff', '&:hover': { bgcolor: colors.surface } }}
+            >
+                Share
+            </Button>
+        </Box>
     );
 
     const renderAdvancedMathBreakdown = () => {
@@ -423,11 +417,11 @@ const Macros: React.FC = () => {
                 display: 'flex',
                 justifyContent: 'center',
                 alignItems: 'center',
-                padding: 2,
+                px: { xs: 0, sm: 2 },
                 py: 4,
             }}
         >
-            <Container maxWidth="sm">
+            <Container maxWidth="sm" sx={{ px: { xs: 1, sm: 3 } }}>
                 <StyledPaper>
                     <Box sx={{ textAlign: 'center', mb: 3 }}>
                         <img
@@ -442,15 +436,18 @@ const Macros: React.FC = () => {
                             }}
                         />
                         <Typography
-                            variant="h4"
+                            variant="h1"
                             sx={{
-                                fontWeight: 700,
+                                fontFamily: headingFont,
+                                fontWeight: 900,
+                                textTransform: 'uppercase',
+                                lineHeight: 0.95,
                                 color: 'text.primary',
                                 mb: 1,
-                                fontSize: 28,
+                                fontSize: { xs: 40, sm: 48 },
                             }}
                         >
-                            💪 Macro Calculator
+                            Macro Calculator
                         </Typography>
                         <Typography
                             variant="body2"
@@ -546,25 +543,7 @@ const Macros: React.FC = () => {
                                 {results && (
                                     <ResultsBox ref={resultsRef}>
                                         {renderResultsBlock(results)}
-                                        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2.5 }}>
-                                            <Button
-                                                variant="outlined"
-                                                startIcon={<ShareOutlinedIcon />}
-                                                onClick={handleShare}
-                                                sx={{
-                                                    borderColor: 'primary.main',
-                                                    color: 'primary.main',
-                                                    fontWeight: 700,
-                                                    textTransform: 'none',
-                                                    px: 3,
-                                                    '&:hover': {
-                                                        borderColor: 'primary.main',
-                                                    },
-                                                }}
-                                            >
-                                                Share
-                                            </Button>
-                                        </Box>
+                                        {renderShareButton()}
                                     </ResultsBox>
                                 )}
                             </Box>
@@ -698,25 +677,7 @@ const Macros: React.FC = () => {
                                     <ResultsBox ref={resultsRef}>
                                         {renderResultsBlock(advResults)}
                                         {renderAdvancedMathBreakdown()}
-                                        <Box sx={{ display: 'flex', justifyContent: 'center', mt: 2.5 }}>
-                                            <Button
-                                                variant="outlined"
-                                                startIcon={<ShareOutlinedIcon />}
-                                                onClick={handleShare}
-                                                sx={{
-                                                    borderColor: 'primary.main',
-                                                    color: 'primary.main',
-                                                    fontWeight: 700,
-                                                    textTransform: 'none',
-                                                    px: 3,
-                                                    '&:hover': {
-                                                        borderColor: 'primary.main',
-                                                    },
-                                                }}
-                                            >
-                                                Share
-                                            </Button>
-                                        </Box>
+                                        {renderShareButton()}
                                     </ResultsBox>
                                 )}
                             </Box>

@@ -8,6 +8,7 @@ import { loadStripe } from '@stripe/stripe-js';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import CheckIcon from '@mui/icons-material/Check';
 import ClockDial from '../components/ClockDial';
+import MacroTiles from '../components/MacroTiles';
 import { colors, headingFont } from '../theme';
 
 const FEATURES = [
@@ -42,11 +43,7 @@ const TESTIMONIALS = [
 ];
 
 // Example output shown in the calculator promo: 180*4 + 210*4 + 70*9 = 2,190 kcal.
-const EXAMPLE_MACROS = [
-    { grams: 180, label: 'Protein' },
-    { grams: 210, label: 'Carbs' },
-    { grams: 70, label: 'Fat' },
-];
+const EXAMPLE_MACROS = { protein: 180, carbs: 210, fat: 70, totalCalories: 2190 };
 
 const container = { maxWidth: 1240, mx: 'auto', px: 3 };
 
@@ -285,20 +282,8 @@ const Home: React.FC = () => {
                     </Box>
                     <Box sx={{ flex: '0 1 420px', minWidth: 0 }}>
                         <Box sx={eyebrowSx}>Example result</Box>
-                        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 1.5, mt: 1.5 }}>
-                            {EXAMPLE_MACROS.map((m) => (
-                                <Box key={m.label} sx={{ bgcolor: colors.navy, color: '#fff', borderRadius: 1.5, px: 2, py: 2.5 }}>
-                                    <Box sx={{ fontFamily: headingFont, fontWeight: 900, fontSize: { xs: 40, sm: 48 }, lineHeight: 1 }}>
-                                        {m.grams}<Box component="span" sx={{ fontSize: 22, color: colors.brand }}>g</Box>
-                                    </Box>
-                                    <Box sx={{ mt: 0.75, fontSize: 13, fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', color: colors.muted }}>
-                                        {m.label}
-                                    </Box>
-                                </Box>
-                            ))}
-                        </Box>
-                        <Box sx={{ mt: 1.5, fontFamily: headingFont, fontWeight: 800, fontSize: 26, textTransform: 'uppercase' }}>
-                            = 2,190 kcal / day
+                        <Box sx={{ mt: 1.5 }}>
+                            <MacroTiles {...EXAMPLE_MACROS} />
                         </Box>
                     </Box>
                 </Box>
