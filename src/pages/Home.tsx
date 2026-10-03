@@ -19,7 +19,7 @@ const FEATURES = [
 ];
 
 const STEPS = [
-    { title: 'Tell us about your week', body: 'Share your schedule, your goals and how you like to train.' },
+    { title: 'Tell your coach about your week', body: 'Share your schedule, your goals and how you like to train.' },
     { title: 'Get your plan', body: 'Your coach builds workouts and meals around your calendar, not the other way round.' },
     { title: 'Check in, anytime', body: 'Message your coach 24/7 and adjust as your week changes.' },
 ];
