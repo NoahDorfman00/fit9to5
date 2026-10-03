@@ -421,9 +421,9 @@ const Home: React.FC = () => {
                     <circle cx="100" cy="100" r="88" fill="none" stroke={colors.surface} strokeWidth="18" />
                     <path d="M100 100 L150 186.6 A100 100 0 0 1 0 100 Z" fill={colors.surface} />
                 </Box>
-                <Box sx={{ position: 'relative', maxWidth: 900, mx: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 3 }}>
-                    <Typography component="h2" sx={{ ...displaySx, fontSize: 'clamp(52px, 7vw, 104px)', lineHeight: 0.9 }}>
-                        Ready to transform <Box component="span" sx={{ color: colors.brand }}>your life?</Box>
+                <Box sx={{ position: 'relative', maxWidth: 1140, mx: 'auto', display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', gap: 3 }}>
+                    <Typography component="h2" sx={{ ...displaySx, fontSize: 'clamp(48px, 6.5vw, 96px)', lineHeight: 0.92 }}>
+                        If someone else can do it, <Box component="span" sx={{ display: 'block', color: colors.brand }}>so can you.</Box>
                     </Typography>
                     <Typography sx={{ maxWidth: 520, fontSize: 18, lineHeight: 1.6, color: colors.muted }}>
                         Join FIT 9to5 today and start your journey to a healthier, more balanced lifestyle.
