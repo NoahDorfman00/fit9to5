@@ -11,6 +11,7 @@ import BeforeAfter from '../components/BeforeAfter';
 import ClockDial from '../components/ClockDial';
 import MacroTiles from '../components/MacroTiles';
 import { colors, headingFont } from '../theme';
+import { PLAN_INCLUDES, PRICE } from '../plan';
 
 const FEATURES = [
     { title: 'Personalized Fitness', body: 'Custom workout plans that fit your schedule and fitness level.' },
@@ -24,16 +25,6 @@ const STEPS = [
     { title: 'Get your plan', body: 'Your coach builds workouts and meals around your calendar, not the other way round.' },
     { title: 'Check in, anytime', body: 'Message your coach 24/7 and adjust as your week changes.' },
 ];
-
-const PLAN_INCLUDES = [
-    'Personalized workout plans',
-    'Meal plans and nutrition guidance',
-    'Mindset and habit coaching',
-    '24/7 access to your coach',
-    'Cancel anytime from your profile',
-];
-
-const PRICE = '$49.99';
 
 // Client results, shared with each client's consent. Photos and quote are each optional;
 // `stat` is the big timeframe shown on the card.
@@ -84,14 +75,18 @@ type SubscriptionStatus = 'subscribed' | 'pending_cancellation' | 'unsubscribed'
 
 const Home: React.FC = () => {
     const navigate = useNavigate();
-    const { user } = useAuth();
+    const { user, loading: authLoading } = useAuth();
     const [subscriptionStatus, setSubscriptionStatus] = useState<SubscriptionStatus>('unsubscribed');
+    // False while a logged-in user's status is loading, so the CTA label doesn't flash
+    // "Subscribe Now" before switching to "View My Profile".
+    const [statusChecked, setStatusChecked] = useState(false);
     const [checkoutLoading, setCheckoutLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
     // Fetch user's subscription status if logged in
     useEffect(() => {
         if (user) {
+            setStatusChecked(false);
             const subRef = ref(database, `users/${user.uid}/subscriptionStatus`);
             get(subRef).then((snapshot) => {
                 if (snapshot.exists()) {
@@ -99,9 +94,12 @@ const Home: React.FC = () => {
                 } else {
                     setSubscriptionStatus('unsubscribed');
                 }
-            });
+            }).catch(() => {
+                setSubscriptionStatus('unsubscribed');
+            }).finally(() => setStatusChecked(true));
         } else {
             setSubscriptionStatus('unsubscribed');
+            setStatusChecked(true);
         }
     }, [user]);
 
@@ -166,6 +164,7 @@ const Home: React.FC = () => {
 
     const isMember = !!user && ['subscribed', 'pending_cancellation'].includes(subscriptionStatus);
     const ctaLabel = isMember ? 'View My Profile' : user ? 'Subscribe Now' : 'Get Started';
+    const ctaReady = !authLoading && statusChecked;
 
     const renderCta = (sx: object = {}) => (
         <>
@@ -175,10 +174,14 @@ const Home: React.FC = () => {
                 disableElevation
                 onClick={handleGetStarted}
                 disabled={checkoutLoading}
-                endIcon={checkoutLoading ? undefined : <ArrowForwardIcon />}
+                endIcon={checkoutLoading ? undefined : <ArrowForwardIcon sx={{ visibility: ctaReady ? 'visible' : 'hidden' }} />}
                 sx={{ ...ctaSx, ...sx }}
             >
-                {checkoutLoading ? <CircularProgress size={24} sx={{ color: colors.navy }} /> : ctaLabel}
+                {checkoutLoading ? (
+                    <CircularProgress size={24} sx={{ color: colors.navy }} />
+                ) : (
+                    <Box component="span" sx={{ visibility: ctaReady ? 'visible' : 'hidden' }}>{ctaLabel}</Box>
+                )}
             </Button>
             {error && (
                 <Typography sx={{ color: '#FF8A80', fontWeight: 600, width: '100%' }}>

@@ -10,7 +10,7 @@ interface LayoutProps {
 }
 
 // Pages that lay out their own full-width sections instead of sitting in the centered container.
-const FULL_BLEED_PATHS = ['/'];
+const FULL_BLEED_PATHS = ['/', '/profile'];
 
 const navLinkSx = { textTransform: 'none', fontWeight: 600, fontSize: 15, color: colors.mutedLight, '&:hover': { color: '#fff' } };
 
