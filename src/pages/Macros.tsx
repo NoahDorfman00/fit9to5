@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import {
-    Box, Container, Typography, TextField, RadioGroup, FormControlLabel, Radio,
+    Box, Typography, TextField, RadioGroup, FormControlLabel, Radio,
     FormControl, FormLabel, Paper, Tabs, Tab, Slider, InputAdornment,
     Button, Snackbar,
 } from '@mui/material';
@@ -12,10 +12,9 @@ import MacroTiles from '../components/MacroTiles';
 import { colors, headingFont } from '../theme';
 
 const StyledPaper = styled(Paper)(({ theme }) => ({
-    padding: 40,
-    maxWidth: 540,
+    padding: 36,
     width: '100%',
-    margin: '0 auto',
+    boxShadow: '0 24px 56px rgba(11,27,43,0.12)',
     [theme.breakpoints.down('sm')]: {
         padding: 20,
     },
@@ -47,11 +46,17 @@ const StyledRadio = styled(Radio)(({ theme }) => ({
 
 const StyledFormControlLabel = styled(FormControlLabel)(({ theme }) => ({
     margin: 0,
-    flex: 1,
-    minWidth: 140,
+    width: '100%',
+    height: '100%',
     '& .MuiFormControlLabel-label': {
-        display: 'block',
-        padding: '12px 16px',
+        width: '100%',
+        height: '100%',
+        boxSizing: 'border-box',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        padding: '12px 6px',
+        lineHeight: 1.2,
         border: `2px solid ${theme.palette.divider}`,
         borderRadius: theme.shape.borderRadius,
         textAlign: 'center',
@@ -71,7 +76,6 @@ const StyledFormControlLabel = styled(FormControlLabel)(({ theme }) => ({
 }));
 
 const ResultsBox = styled(Box)(({ theme }) => ({
-    marginTop: 30,
     padding: 24,
     background: colors.brand,
     color: colors.navy,
@@ -119,6 +123,14 @@ const StyledTab = styled(Tab)(({ theme }) => ({
         color: theme.palette.primary.main,
     },
 }));
+
+const container = { maxWidth: 1080, mx: 'auto', px: 3 };
+
+const GAINER_HINTS = {
+    hard: 'Hard gainer: you find it hard to put on weight.',
+    neutral: 'Neutral: you gain and lose weight at a typical rate.',
+    easy: 'Easy gainer: you put on weight easily.',
+};
 
 interface MacroResults {
     totalCalories: number;
@@ -204,14 +216,11 @@ const Macros: React.FC = () => {
         const currentWeightNum = parseFloat(currentWeight);
         const targetWeightNum = parseFloat(targetWeight);
 
-        if (!currentWeight || currentWeightNum <= 0) {
-            setCurrentWeightError('Please enter a valid weight');
-            setResults(null);
-            return;
-        }
-
-        if (!targetWeight || targetWeightNum <= 0) {
-            setTargetWeightError('Please enter a valid weight');
+        const currentValid = currentWeightNum > 0;
+        const targetValid = targetWeightNum > 0;
+        if (currentWeight && !currentValid) setCurrentWeightError('Please enter a valid weight');
+        if (targetWeight && !targetValid) setTargetWeightError('Please enter a valid weight');
+        if (!currentValid || !targetValid) {
             setResults(null);
             return;
         }
@@ -250,14 +259,11 @@ const Macros: React.FC = () => {
         const cals = parseFloat(advCalories);
         const tw = parseFloat(advTargetWeight);
 
-        if (!advCalories || cals <= 0) {
-            setAdvCaloriesError('Please enter a valid calorie target');
-            setAdvResults(null);
-            return;
-        }
-
-        if (!advTargetWeight || tw <= 0) {
-            setAdvTargetWeightError('Please enter a valid target weight');
+        const calsValid = cals > 0;
+        const twValid = tw > 0;
+        if (advCalories && !calsValid) setAdvCaloriesError('Please enter a valid calorie target');
+        if (advTargetWeight && !twValid) setAdvTargetWeightError('Please enter a valid target weight');
+        if (!calsValid || !twValid) {
             setAdvResults(null);
             return;
         }
@@ -409,69 +415,65 @@ const Macros: React.FC = () => {
         );
     };
 
-    return (
-        <Box
-            sx={{
-                minHeight: 'calc(100vh - 120px)',
-                bgcolor: 'background.default',
-                display: 'flex',
-                justifyContent: 'center',
-                alignItems: 'center',
-                px: { xs: 0, sm: 2 },
-                py: 4,
-            }}
-        >
-            <Container maxWidth="sm" sx={{ px: { xs: 1, sm: 3 } }}>
-                <StyledPaper>
-                    <Box sx={{ textAlign: 'center', mb: 3 }}>
-                        <img
-                            src="/assets/logo.png"
-                            alt="FIT 9to5 Logo"
-                            style={{
-                                maxWidth: 200,
-                                height: 'auto',
-                                display: 'block',
-                                margin: '0 auto 20px',
-                                borderRadius: '50%',
-                            }}
-                        />
-                        <Typography
-                            variant="h1"
-                            sx={{
-                                fontFamily: headingFont,
-                                fontWeight: 900,
-                                textTransform: 'uppercase',
-                                lineHeight: 0.95,
-                                color: 'text.primary',
-                                mb: 1,
-                                fontSize: { xs: 40, sm: 48 },
-                            }}
-                        >
-                            Macro Calculator
-                        </Typography>
-                        <Typography
-                            variant="body2"
-                            sx={{
-                                color: 'text.secondary',
-                                mb: 1,
-                                fontSize: 14,
-                            }}
-                        >
-                            Calculate your personalized macronutrient split
-                        </Typography>
+    const currentResults = activeTab === 0 ? results : advResults;
+
+    const renderEmptyResults = () => (
+        <ResultsBox>
+            <Typography sx={{ fontSize: 14, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', mb: 1.5 }}>
+                Your macro split
+            </Typography>
+            <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: { xs: 1, sm: 1.5 } }}>
+                {['Protein', 'Carbs', 'Fat'].map((label) => (
+                    <Box key={label} sx={{ bgcolor: 'rgba(11,27,43,0.12)', border: `2px dashed rgba(11,27,43,0.35)`, borderRadius: 1.5, px: { xs: 1.25, sm: 2 }, py: { xs: 2, sm: 2.5 } }}>
+                        <Box sx={{ fontFamily: headingFont, fontWeight: 900, fontSize: { xs: 30, sm: 48 }, lineHeight: 1 }}>—</Box>
+                        <Box sx={{ mt: 0.75, fontSize: { xs: 11, sm: 13 }, fontWeight: 700, letterSpacing: { xs: '0.06em', sm: '0.1em' }, textTransform: 'uppercase' }}>
+                            {label}
+                        </Box>
                     </Box>
+                ))}
+            </Box>
+            <Typography sx={{ mt: 2, fontSize: 15, fontWeight: 600 }}>
+                {activeTab === 0
+                    ? 'Enter your current and target weight to see your split.'
+                    : 'Enter your calorie target and target weight to see your split.'}
+            </Typography>
+        </ResultsBox>
+    );
 
-                    <StyledTabs
-                        value={activeTab}
-                        onChange={(_, v) => setActiveTab(v)}
-                        variant="fullWidth"
+    return (
+        <Box sx={{ bgcolor: colors.mist, pb: { xs: 8, md: 12 } }}>
+            {/* Title band */}
+            <Box sx={{ bgcolor: colors.navy, color: '#fff', pt: { xs: 6, md: 8 }, pb: { xs: 12, md: 14 } }}>
+                <Box sx={{ ...container, display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <Box sx={{ fontSize: 14, fontWeight: 800, letterSpacing: '0.14em', textTransform: 'uppercase', color: colors.brand }}>
+                        Free tool · No account needed
+                    </Box>
+                    <Typography
+                        variant="h1"
+                        sx={{ fontFamily: headingFont, fontWeight: 900, textTransform: 'uppercase', lineHeight: 0.92, fontSize: { xs: 48, sm: 64, md: 80 } }}
                     >
-                        <StyledTab label="Basic" />
-                        <StyledTab label="Advanced" />
-                    </StyledTabs>
+                        Macro <Box component="span" sx={{ color: colors.brand }}>calculator</Box>
+                    </Typography>
+                    <Typography sx={{ maxWidth: 520, fontSize: { xs: 17, md: 18 }, lineHeight: 1.6, color: colors.muted }}>
+                        Get a protein, carb and fat split for your goal in about 30 seconds.
+                    </Typography>
+                </Box>
+            </Box>
 
-                    {/* ── Basic Tab ── */}
-                    {activeTab === 0 && (
+            <Box sx={{ ...container, mt: { xs: -8, md: -10 } }}>
+                <Box sx={{ display: 'grid', gridTemplateColumns: { xs: '1fr', md: 'minmax(0, 1fr) minmax(0, 1fr)' }, gap: 2.5, alignItems: 'start' }}>
+                    <StyledPaper>
+                        <StyledTabs
+                            value={activeTab}
+                            onChange={(_, v) => setActiveTab(v)}
+                            variant="fullWidth"
+                        >
+                            <StyledTab label="Basic" />
+                            <StyledTab label="Advanced" />
+                        </StyledTabs>
+
+                        {/* ── Basic Tab ── */}
+                        {activeTab === 0 && (
                             <Box>
                                 <Box sx={{ mb: 3 }}>
                                     <StyledTextField
@@ -499,7 +501,7 @@ const Macros: React.FC = () => {
                                     />
                                 </Box>
 
-                                <FormControl component="fieldset" sx={{ mb: 3, width: '100%' }}>
+                                <FormControl component="fieldset" sx={{ width: '100%' }}>
                                     <FormLabel
                                         component="legend"
                                         sx={{
@@ -507,19 +509,19 @@ const Macros: React.FC = () => {
                                             fontSize: 14,
                                             color: 'text.primary',
                                             mb: 1,
+                                            '&.Mui-focused': { color: 'text.primary' },
                                         }}
                                     >
                                         Gainer Type
                                     </FormLabel>
                                     <RadioGroup
-                                        row
                                         name="gainerType"
                                         value={gainerType}
                                         onChange={(e) => setGainerType(e.target.value)}
                                         sx={{
-                                            display: 'flex',
+                                            display: 'grid',
+                                            gridTemplateColumns: 'repeat(3, minmax(0, 1fr))',
                                             gap: 1,
-                                            flexWrap: 'wrap',
                                         }}
                                     >
                                         <StyledFormControlLabel
@@ -538,19 +540,15 @@ const Macros: React.FC = () => {
                                             label="Easy Gainer"
                                         />
                                     </RadioGroup>
+                                    <Typography sx={{ mt: 1.25, fontSize: 13, color: 'text.secondary' }}>
+                                        {GAINER_HINTS[gainerType as keyof typeof GAINER_HINTS]}
+                                    </Typography>
                                 </FormControl>
-
-                                {results && (
-                                    <ResultsBox ref={resultsRef}>
-                                        {renderResultsBlock(results)}
-                                        {renderShareButton()}
-                                    </ResultsBox>
-                                )}
                             </Box>
-                    )}
+                        )}
 
-                    {/* ── Advanced Tab ── */}
-                    {activeTab === 1 && (
+                        {/* ── Advanced Tab ── */}
+                        {activeTab === 1 && (
                             <Box>
                                 <Box sx={{ mb: 3 }}>
                                     <StyledTextField
@@ -627,7 +625,7 @@ const Macros: React.FC = () => {
                                     </Box>
                                 </Box>
 
-                                <Box sx={{ mb: 3 }}>
+                                <Box>
                                     <Typography
                                         sx={{
                                             fontWeight: 700,
@@ -672,28 +670,33 @@ const Macros: React.FC = () => {
                                         </Typography>
                                     </Box>
                                 </Box>
-
-                                {advResults && (
-                                    <ResultsBox ref={resultsRef}>
-                                        {renderResultsBlock(advResults)}
-                                        {renderAdvancedMathBreakdown()}
-                                        {renderShareButton()}
-                                    </ResultsBox>
-                                )}
                             </Box>
-                    )}
-                    <Snackbar
-                        open={snackbarOpen}
-                        autoHideDuration={2500}
-                        onClose={() => setSnackbarOpen(false)}
-                        message="Link copied!"
-                        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-                    />
-                </StyledPaper>
-            </Container>
+                        )}
+                    </StyledPaper>
+
+                    {/* Results: beside the inputs on desktop, below them on phones */}
+                    <Box sx={{ position: { md: 'sticky' }, top: { md: 88 } }}>
+                        {currentResults ? (
+                            <ResultsBox ref={resultsRef} key={activeTab}>
+                                {renderResultsBlock(currentResults)}
+                                {activeTab === 1 && renderAdvancedMathBreakdown()}
+                                {renderShareButton()}
+                            </ResultsBox>
+                        ) : (
+                            renderEmptyResults()
+                        )}
+                    </Box>
+                </Box>
+            </Box>
+            <Snackbar
+                open={snackbarOpen}
+                autoHideDuration={2500}
+                onClose={() => setSnackbarOpen(false)}
+                message="Link copied!"
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+            />
         </Box>
     );
 };
 
 export default Macros;
-
