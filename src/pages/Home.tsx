@@ -7,6 +7,7 @@ import { ref, get } from 'firebase/database';
 import { loadStripe } from '@stripe/stripe-js';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
 import CheckIcon from '@mui/icons-material/Check';
+import BeforeAfter from '../components/BeforeAfter';
 import ClockDial from '../components/ClockDial';
 import MacroTiles from '../components/MacroTiles';
 import { colors, headingFont } from '../theme';
@@ -34,11 +35,29 @@ const PLAN_INCLUDES = [
 
 const PRICE = '$49.99';
 
-const TESTIMONIALS = [
+// Client results, shared with each client's consent. Photos and quote are each optional;
+// `stat` is the big timeframe shown on the card.
+interface ClientResult {
+    name: string;
+    detail: string;
+    stat: string;
+    photos?: { before: string; after: string };
+    quote?: string;
+}
+
+const RESULTS: ClientResult[] = [
     {
         name: 'Lauren',
         detail: 'Training with Noah for two years',
+        stat: '2 years',
+        photos: { before: '/assets/results/lauren-before.jpg', after: '/assets/results/lauren-after.jpg' },
         quote: 'In the past two years that I’ve been working out with Noah, I’ve seen so much growth in myself — both physically and mentally. I’m not only the strongest that I’ve ever been, but he helped me fall in love with the process. Going to the gym isn’t a chore to me anymore. Noah keeps me on track and pushes me in the gym, but will also share a piece of cake with me every so often. It’s really all about balance.',
+    },
+    {
+        name: 'Jacob',
+        detail: '5-month transformation',
+        stat: '5 months',
+        photos: { before: '/assets/results/jacob-before.jpg', after: '/assets/results/jacob-after.jpg' },
     },
 ];
 
@@ -259,6 +278,34 @@ const Home: React.FC = () => {
                 </Box>
             </Box>
 
+            {/* Meet your coach */}
+            <Box component="section" sx={{ py: { xs: 9, md: 13 } }}>
+                <Box sx={{ ...container, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: { xs: 5, md: 8 } }}>
+                    <Box sx={{ flex: '1 1 400px', minWidth: 0, maxWidth: 520 }}>
+                        <BeforeAfter before="/assets/results/noah-before.jpg" after="/assets/results/noah-after.jpg" subject="Noah" />
+                    </Box>
+                    <Box sx={{ flex: '1 1 420px', minWidth: 0, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+                        <Box sx={{ ...eyebrowSx, color: colors.brand }}>Meet your coach</Box>
+                        <Typography component="h2" sx={sectionTitleSx}>
+                            Hi, I’m <Box component="span" sx={{ color: colors.brand }}>Noah.</Box>
+                        </Typography>
+                        <Typography sx={{ fontSize: 18, lineHeight: 1.65, color: '#E6EDF3' }}>
+                            I started FIT 9to5 to share what I learned from my own weight-loss and fitness journey.
+                            Those are my before and after photos.
+                        </Typography>
+                        <Typography sx={{ fontSize: 17, lineHeight: 1.65, color: colors.muted }}>
+                            My approach is about balance: strength training that evolves with your progress and
+                            nutrition that fits the way you actually live, without ever turning down chicken parm.
+                            Fitness should work around your schedule, not take it over.
+                        </Typography>
+                        <Typography sx={{ fontSize: 17, lineHeight: 1.65, color: colors.muted }}>
+                            When you train with me, I’m one message away for feedback, form checks, or a push when
+                            you need it.
+                        </Typography>
+                    </Box>
+                </Box>
+            </Box>
+
             {/* Macro calculator promo */}
             <Box component="section" sx={{ bgcolor: colors.brand, color: colors.navy }}>
                 <Box sx={{ ...container, py: { xs: 8, md: 11 }, display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 6 }}>
@@ -289,27 +336,39 @@ const Home: React.FC = () => {
                 </Box>
             </Box>
 
-            {/* Testimonials */}
+            {/* Results: client transformations and testimonials */}
             <Box component="section" sx={{ py: { xs: 9, md: 13 } }}>
-                <Box sx={{ ...container, display: 'flex', flexDirection: 'column', gap: 6 }}>
+                <Box sx={{ ...container, display: 'flex', flexDirection: 'column', gap: { xs: 4, md: 6 } }}>
+                    <Box sx={{ ...eyebrowSx, color: colors.brand, mb: -2 }}>Client results</Box>
                     <Typography component="h2" sx={sectionTitleSx}>
                         From people with <Box component="span" sx={{ color: colors.brand }}>full calendars.</Box>
                     </Typography>
-                    <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 2.5 }}>
-                        {TESTIMONIALS.map((t) => (
-                            <Box component="figure" key={t.name} sx={{ m: 0, p: { xs: 3.5, md: 5 }, borderRadius: 1.5, bgcolor: colors.surface, display: 'flex', flexDirection: 'column', gap: 3 }}>
-                                <Box component="span" aria-hidden="true" sx={{ fontFamily: headingFont, fontWeight: 900, fontSize: 96, lineHeight: 0.6, color: colors.brand }}>
-                                    “
+                    {RESULTS.map((r, i) => (
+                        <Box
+                            component="figure"
+                            key={r.name}
+                            sx={{ m: 0, p: { xs: 2, md: 3 }, borderRadius: 2, bgcolor: colors.surface, display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: { xs: 3, md: 5 } }}
+                        >
+                            {r.photos && (
+                                <Box sx={{ flex: '1 1 340px', minWidth: 0, maxWidth: { md: 520 }, order: { md: i % 2 } }}>
+                                    <BeforeAfter before={r.photos.before} after={r.photos.after} subject={r.name} />
                                 </Box>
-                                <Box component="blockquote" sx={{ m: 0, fontSize: { xs: 18, md: TESTIMONIALS.length === 1 ? 24 : 18 }, lineHeight: 1.6, color: '#E6EDF3', maxWidth: 900 }}>
-                                    {t.quote}
+                            )}
+                            <Box sx={{ flex: '1 1 340px', minWidth: 0, px: { xs: 1, md: 2 }, pb: { xs: 1, md: 0 }, display: 'flex', flexDirection: 'column', gap: 2.5 }}>
+                                <Box sx={{ fontFamily: headingFont, fontWeight: 900, fontSize: { xs: 56, md: 80 }, lineHeight: 0.9, textTransform: 'uppercase', color: colors.brand }}>
+                                    {r.stat}
                                 </Box>
-                                <Box component="figcaption" sx={{ mt: 'auto', fontSize: 15, color: colors.muted }}>
-                                    <Box component="strong" sx={{ color: '#fff' }}>{t.name}</Box> · {t.detail}
+                                {r.quote && (
+                                    <Box component="blockquote" sx={{ m: 0, fontSize: { xs: 17, md: 18 }, lineHeight: 1.65, color: '#E6EDF3' }}>
+                                        “{r.quote}”
+                                    </Box>
+                                )}
+                                <Box component="figcaption" sx={{ fontSize: 15, color: colors.muted }}>
+                                    <Box component="strong" sx={{ color: '#fff' }}>{r.name}</Box> · {r.detail}
                                 </Box>
                             </Box>
-                        ))}
-                    </Box>
+                        </Box>
+                    ))}
                 </Box>
             </Box>
 
