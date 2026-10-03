@@ -48,7 +48,7 @@ const Auth: React.FC = () => {
 
     return (
         <Box sx={{ maxWidth: 400, mx: 'auto', mt: 6, px: 1 }}>
-            <Paper elevation={3} sx={{ p: 3, bgcolor: '#fff', borderRadius: 4, boxShadow: '0 4px 24px 0 rgba(0,0,0,0.10)', mx: { xs: 1, sm: 0 } }}>
+            <Paper elevation={3} sx={{ p: 3, mx: { xs: 1, sm: 0 } }}>
                 <Typography variant="h5" gutterBottom align="center">
                     {isSignup ? 'Sign Up' : 'Log In'}
                 </Typography>
@@ -85,7 +85,7 @@ const Auth: React.FC = () => {
                 </form>
                 <Button
                     variant="outlined"
-                    color="secondary"
+                    color="primary"
                     fullWidth
                     sx={{ mt: 2 }}
                     onClick={handleGoogle}
