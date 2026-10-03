@@ -14,5 +14,4 @@ export const PLAN_INCLUDES = [
 // that anything in the client bundle is public.
 export const COACH_PHONE = { display: '(856) 381-1006', e164: '+18563811006' };
 
-// "?&body=" is the form both iOS and Android accept for a prefilled message.
-export const TEXT_COACH_HREF = `sms:${COACH_PHONE.e164}?&body=${encodeURIComponent('Hey Noah, ')}`;
+export const TEXT_COACH_HREF = `sms:${COACH_PHONE.e164}`;
