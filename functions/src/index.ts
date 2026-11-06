@@ -12,6 +12,83 @@ const stripeSecretKey = defineSecret("STRIPE_SECRET_KEY");
 const stripeWebhookSecret = defineSecret("STRIPE_WEBHOOK_SECRET");
 const stripePriceId = defineSecret("STRIPE_PRICE_ID");
 
+// The Stripe account is shared with other apps
+// (flashcards, Claudio, the wedding site), and every webhook on it
+// receives every app's events. A Stripe customer can be shared
+// too, since checkout finds customers by email. This app's checkouts and
+// subscriptions carry metadata.app = APP_TAG; older ones are recognized by
+// this app's Stripe product.
+const APP_TAG = "fit9to5";
+
+/**
+ * The Stripe product behind this app's price. Matching on the product (not
+ * the price) also covers subscribers on older prices of the same product.
+ * @param {Stripe} stripe Stripe client.
+ * @return {Promise<string>} The product id.
+ */
+async function ownProductId(stripe: Stripe): Promise<string> {
+  const price = await stripe.prices.retrieve(stripePriceId.value());
+  return typeof price.product === "string" ? price.product : price.product.id;
+}
+
+/**
+ * Whether a subscription belongs to this app (tagged, or on its product).
+ * @param {Stripe} stripe Stripe client.
+ * @param {Stripe.Subscription} sub The subscription from Stripe.
+ * @return {Promise<boolean>} True for this app's own subscriptions.
+ */
+async function isOwnSubscription(
+  stripe: Stripe,
+  sub: Stripe.Subscription
+): Promise<boolean> {
+  if (sub.metadata?.app) return sub.metadata.app === APP_TAG;
+  const productId = await ownProductId(stripe);
+  return sub.items.data.some((item) => {
+    const p = item.price.product;
+    return (typeof p === "string" ? p : p.id) === productId;
+  });
+}
+
+/**
+ * Whether a completed checkout started this app's subscription.
+ * @param {Stripe} stripe Stripe client.
+ * @param {Stripe.Checkout.Session} session The completed session.
+ * @return {Promise<boolean>} True for this app's own checkouts.
+ */
+async function isOwnCheckout(
+  stripe: Stripe,
+  session: Stripe.Checkout.Session
+): Promise<boolean> {
+  if (session.mode !== "subscription" || !session.subscription) return false;
+  if (session.metadata?.app) return session.metadata.app === APP_TAG;
+  // Checkouts started before tagging: check the subscription itself
+  const subId = typeof session.subscription === "string" ?
+    session.subscription : session.subscription.id;
+  return isOwnSubscription(stripe, await stripe.subscriptions.retrieve(subId));
+}
+
+/**
+ * This app's active subscription for a customer, ignoring subscriptions the
+ * same (email-shared) customer has with other apps.
+ * @param {Stripe} stripe Stripe client.
+ * @param {string} customerId The Stripe customer.
+ * @return {Promise<Stripe.Subscription | undefined>} The subscription.
+ */
+async function findOwnActiveSubscription(
+  stripe: Stripe,
+  customerId: string
+): Promise<Stripe.Subscription | undefined> {
+  const subs = await stripe.subscriptions.list({
+    customer: customerId,
+    status: "active",
+    limit: 20,
+  });
+  for (const sub of subs.data) {
+    if (await isOwnSubscription(stripe, sub)) return sub;
+  }
+  return undefined;
+}
+
 // Initialize CORS middleware with specific configuration
 const corsHandler = cors({
   origin: [
@@ -107,6 +184,8 @@ export const createCheckoutSession = onRequest({
         success_url: successUrl,
         cancel_url: cancelUrl,
         client_reference_id: uid,
+        metadata: {app: APP_TAG, firebaseUID: uid},
+        subscription_data: {metadata: {app: APP_TAG, firebaseUID: uid}},
       });
 
       res.json({sessionId: session.id});
@@ -119,7 +198,7 @@ export const createCheckoutSession = onRequest({
 
 // 2. Cancel Subscription
 export const cancelSubscription = onRequest({
-  secrets: [stripeSecretKey],
+  secrets: [stripeSecretKey, stripePriceId],
   cors: false,
   region: "us-central1",
 }, async (req, res) => {
@@ -159,11 +238,8 @@ export const cancelSubscription = onRequest({
         typescript: true,
       });
 
-      const subscriptions = await stripe.subscriptions.list({
-        customer: stripeCustomerId,
-        status: "active",
-        limit: 1,
-      });
+      const own = await findOwnActiveSubscription(stripe, stripeCustomerId);
+      const subscriptions = {data: own ? [own] : []};
 
       if (subscriptions.data.length === 0) {
         res.status(404).json({error: "No active subscription found"});
@@ -189,7 +265,7 @@ export const cancelSubscription = onRequest({
 
 // 3. Reactivate Subscription
 export const reactivateSubscription = onRequest({
-  secrets: [stripeSecretKey],
+  secrets: [stripeSecretKey, stripePriceId],
   cors: false,
   region: "us-central1",
 }, async (req, res) => {
@@ -229,11 +305,8 @@ export const reactivateSubscription = onRequest({
         typescript: true,
       });
 
-      const subscriptions = await stripe.subscriptions.list({
-        customer: stripeCustomerId,
-        status: "active",
-        limit: 1,
-      });
+      const own = await findOwnActiveSubscription(stripe, stripeCustomerId);
+      const subscriptions = {data: own ? [own] : []};
 
       if (subscriptions.data.length === 0) {
         res.status(404).json({error: "No active subscription found"});
@@ -314,7 +387,7 @@ export const createPortalSession = onRequest({
 
 // 5. Stripe Webhook Handler
 export const stripeWebhook = onRequest({
-  secrets: [stripeSecretKey, stripeWebhookSecret],
+  secrets: [stripeSecretKey, stripeWebhookSecret, stripePriceId],
   cors: false,
   region: "us-central1",
 }, async (req, res) => {
@@ -341,6 +414,7 @@ export const stripeWebhook = onRequest({
     switch (event.type) {
     case "checkout.session.completed": {
       const session = event.data.object as Stripe.Checkout.Session;
+      if (!(await isOwnCheckout(stripe, session))) break;
       const uid = session.client_reference_id;
 
       if (uid) {
@@ -353,6 +427,7 @@ export const stripeWebhook = onRequest({
 
     case "customer.subscription.updated": {
       const subscription = event.data.object as Stripe.Subscription;
+      if (!(await isOwnSubscription(stripe, subscription))) break;
       const customerId = subscription.customer as string;
 
       // Find user by Stripe customer ID
@@ -385,6 +460,7 @@ export const stripeWebhook = onRequest({
 
     case "customer.subscription.deleted": {
       const subscription = event.data.object as Stripe.Subscription;
+      if (!(await isOwnSubscription(stripe, subscription))) break;
       const customerId = subscription.customer as string;
 
       const usersRef = admin.database().ref("users");
